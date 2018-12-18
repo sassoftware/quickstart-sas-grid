@@ -460,7 +460,7 @@
                         "Fn::Sub": "var response = require('cfn-response');\nexports.handler = function(event, context) {\n  var result = parseInt(event.ResourceProperties.Op1) / parseInt(event.ResourceProperties.Op2);\n  response.send(event, context, response.SUCCESS, {Value: result});\n};\n"
                     }
                 },
-                "Runtime": "nodejs4.3"
+                "Runtime": "nodejs8.10"
             }
         },
         "DivideEBSVolumeSize": {
@@ -1410,7 +1410,7 @@
                         ]
                     }
                 },
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs8.10",
                 "Timeout": 300
             },
             "DependsOn": [
