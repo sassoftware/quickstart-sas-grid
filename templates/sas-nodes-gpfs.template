@@ -733,7 +733,7 @@
                                 {
                                     "Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"
                                 },
-                                "PARENT_STACK_NAME=$(aws --region ${REGION} cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text)\n",
+                                "PARENT_STACK_NAME=`aws --region $Region cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text`\n",
                                 "PRIVATE_KEY=ssh-key-private$PARENT_STACK_NAME-GPFSStack- \n",
                                 "PUBLIC_KEY=ssh-key-public$PARENT_STACK_NAME-GPFSStack- \n",
                                 "CHECK_PRIVATE_KEY=`aws ssm describe-parameters --region $Region | grep $PRIVATE_KEY | cut -d'\"' -f4 | wc -l` \n",
@@ -886,7 +886,6 @@
                                 {
                                     "Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"
                                 },
-                                "echo \"Region is ${REGION}\" \n",
                                 "PARENT_STACK_NAME=$(aws --region ${REGION} cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text)\n",
                                 "KEY=$(aws ssm get-parameter --region $REGION --name \"sas-grid-ansiblekey-${PARENT_STACK_NAME}\" --query Parameter.Value --output text)\n",
                                 "echo \"$KEY\" | su ec2-user bash -c 'tee -a ~/.ssh/authorized_keys'\n",
