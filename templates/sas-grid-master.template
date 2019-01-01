@@ -44,15 +44,15 @@
                         "RDGWCIDR"
                     ]
                 },
-				{
-					"Label": {
-					"default": "Storage Stack:"
-					},
-					"Parameters": [
-					"StorageStack"
-					]
-				},
-				{
+                {
+                    "Label": {
+                        "default": "Storage Stack:"
+                    },
+                    "Parameters": [
+                        "StorageStack"
+                    ]
+                },
+                {
                     "Label": {
                         "default": "GPFS EC2 Configurations:"
                     },
@@ -61,7 +61,7 @@
                         "ServerNodeCount"
                     ]
                 },
-				{
+                {
                     "Label": {
                         "default": "Personal Configuration:"
                     },
@@ -113,7 +113,7 @@
                 "StorageStack": {
                     "default": "Select the Storage Stack"
                 },
-				"SASSoftwareDepot": {
+                "SASSoftwareDepot": {
                     "default": "SAS Software Depot tar file S3 location"
                 },
                 "SASSoftwareDepotName": {
@@ -197,7 +197,7 @@
                 "NoOfSASGridInstances": {
                     "default": "Required No of SASGrid Instances"
                 },
-				"LicenseAgreementTerms": {
+                "LicenseAgreementTerms": {
                     "default": "License Agreement Terms"
                 },
                 "DiskPerNode": {
@@ -226,22 +226,22 @@
             "Type": "String"
         },
         "SASPlanFiles": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "must be a folder of planfiles in S3 location, e.g. mysasbucket/sasplanfiles/",
-             "Description": "S3 location of the folder with the SAS Plan files.For e.g. If the plan file is uploaded to '<<s3-bucket-name>>/plan-files', please enter '<<s3-bucket-name>>/plan-files'",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be a folder of planfiles in S3 location, e.g. mysasbucket/sasplanfiles/",
+            "Description": "S3 location of the folder with the SAS Plan files.For e.g. If the plan file is uploaded to '<<s3-bucket-name>>/plan-files', please enter '<<s3-bucket-name>>/plan-files'",
+            "Type": "String"
         },
         "SASLicenseMeta": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "must be file name containing the SAS Metadata license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
-             "Description": "Name of SAS Metadata License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Metadata license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Metadata License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
+            "Type": "String"
         },
         "SASLicenseApp": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "must be file name containing the SAS Application Server license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
-             "Description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Application Server license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
+            "Type": "String"
         },
         "AdminPassword": {
             "Description": "Password for the administrative account. Must be at least 8 characters containing letters, numbers and symbols",
@@ -270,7 +270,7 @@
             "MinLength": "3",
             "Type": "String"
         },
-		"StorageStack": {
+        "StorageStack": {
             "Description": "Select Storage Stack",
             "Type": "String",
             "AllowedValues": [
@@ -412,7 +412,7 @@
             "Description": "CIDR Block for the VPC",
             "Type": "String"
         },
-		"LicenseAgreementTerms": {
+        "LicenseAgreementTerms": {
             "AllowedValues": [
                 "Accept"
             ],
@@ -731,7 +731,7 @@
                             "Outputs.PrivateSubnet1BID"
                         ]
                     },
-					"PrivateSubnet3ID": {
+                    "PrivateSubnet3ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PrivateSubnet2AID"
@@ -767,21 +767,21 @@
                             "Outputs.RemoteDesktopGatewaySGID"
                         ]
                     },
-					"DiskPerNode": {
-						"Ref": "DiskPerNode"
-					},
-					"StorageStack": {
-						"Ref": "StorageStack"
-					},
-					"ServerNodeCount": {
-						"Ref": "ServerNodeCount"
-					},
-					"OperatorEmail": {
-						"Ref": "OperatorEmail"
-					},
-					"LicenseAgreementTerms": {
-						"Ref": "LicenseAgreementTerms"
-					}
+                    "DiskPerNode": {
+                        "Ref": "DiskPerNode"
+                    },
+                    "StorageStack": {
+                        "Ref": "StorageStack"
+                    },
+                    "ServerNodeCount": {
+                        "Ref": "ServerNodeCount"
+                    },
+                    "OperatorEmail": {
+                        "Ref": "OperatorEmail"
+                    },
+                    "LicenseAgreementTerms": {
+                        "Ref": "LicenseAgreementTerms"
+                    }
                 }
             },
             "DependsOn": [

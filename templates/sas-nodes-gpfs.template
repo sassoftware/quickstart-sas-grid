@@ -570,16 +570,16 @@
                                 "SERVERNODE_ID=`aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-name $SERVER_ASG_ID | grep InstanceId | cut -d'\"' -f4| tail -1` \n",
                                 "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID | grep PrivateIpAddress | tail -1 | cut -d'\"' -f4` \n",
                                 "mkdir -p ",
-								{
-									"Ref": "GpfsMountPoint"
-								},
-								" \n",
-								"ln -s ",
-								{
-									"Ref": "GpfsMountPoint"
-								},
-								" /sas \n",
-								"ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
+                                {
+                                    "Ref": "GpfsMountPoint"
+                                },
+                                " \n",
+                                "ln -s ",
+                                {
+                                    "Ref": "GpfsMountPoint"
+                                },
+                                " /sas \n",
+                                "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
                                 "/usr/lpp/mmfs/bin/mmchlicense client -N $HOSTNAME --accept \n",
@@ -734,16 +734,16 @@
                                     "Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"
                                 },
                                 "PARENT_STACK_NAME=$(aws --region ${REGION} cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text)\n",
-								"PRIVATE_KEY=ssh-key-private$PARENT_STACK_NAME-GPFSStack- \n",
-								"PUBLIC_KEY=ssh-key-public$PARENT_STACK_NAME-GPFSStack- \n",
-								"CHECK_PRIVATE_KEY=`aws ssm describe-parameters --region $Region | grep $PRIVATE_KEY | cut -d'\"' -f4 | wc -l` \n",
+                                "PRIVATE_KEY=ssh-key-private$PARENT_STACK_NAME-GPFSStack- \n",
+                                "PUBLIC_KEY=ssh-key-public$PARENT_STACK_NAME-GPFSStack- \n",
+                                "CHECK_PRIVATE_KEY=`aws ssm describe-parameters --region $Region | grep $PRIVATE_KEY | cut -d'\"' -f4 | wc -l` \n",
                                 "until [ ${CHECK_PRIVATE_KEY} -eq '1' ] \n",
                                 "do \n",
                                 "        CHECK_PRIVATE_KEY=`aws ssm describe-parameters --region $Region | grep $PRIVATE_KEY | cut -d'\"' -f4 | wc -l` \n",
                                 "        sleep 10 \n",
                                 "        echo \"Waiting for SSH keys to be created by IBM Spectrum Scale Server Node\" \n",
                                 "done \n",
-								"CHECK_PUBLIC_KEY=`aws ssm describe-parameters --region $Region | grep $PUBLIC_KEY | cut -d'\"' -f4 | wc -l` \n",
+                                "CHECK_PUBLIC_KEY=`aws ssm describe-parameters --region $Region | grep $PUBLIC_KEY | cut -d'\"' -f4 | wc -l` \n",
                                 "until [ ${CHECK_PUBLIC_KEY} -eq '1' ] \n",
                                 "do \n",
                                 "        CHECK_PUBLIC_KEY=`aws ssm describe-parameters --region $Region | grep $PUBLIC_KEY | cut -d'\"' -f4 | wc -l` \n",
@@ -829,16 +829,16 @@
                                 "SERVERNODE_ID=`aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-name $SERVER_ASG_ID | grep InstanceId | cut -d'\"' -f4| tail -1` \n",
                                 "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID | grep PrivateIpAddress | tail -1 | cut -d'\"' -f4` \n",
                                 "mkdir -p ",
-								{
-									"Ref": "GpfsMountPoint"
-								},
-								" \n",
-								"ln -s ",
-								{
-									"Ref": "GpfsMountPoint"
-								},
-								" /sas \n",
-								"ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
+                                {
+                                    "Ref": "GpfsMountPoint"
+                                },
+                                " \n",
+                                "ln -s ",
+                                {
+                                    "Ref": "GpfsMountPoint"
+                                },
+                                " /sas \n",
+                                "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
                                 "/usr/lpp/mmfs/bin/mmchlicense client -N $HOSTNAME --accept \n",
@@ -1133,16 +1133,16 @@
                                 "SERVERNODE_ID=`aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-name $SERVER_ASG_ID | grep InstanceId | cut -d'\"' -f4| tail -1` \n",
                                 "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID | grep PrivateIpAddress | tail -1 | cut -d'\"' -f4` \n",
                                 "mkdir -p ",
-								{
-									"Ref": "GpfsMountPoint"
-								},
-								" \n",
-								"ln -s ",
-								{
-									"Ref": "GpfsMountPoint"
-								},
-								" /sas \n",
-								"ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
+                                {
+                                    "Ref": "GpfsMountPoint"
+                                },
+                                " \n",
+                                "ln -s ",
+                                {
+                                    "Ref": "GpfsMountPoint"
+                                },
+                                " /sas \n",
+                                "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
                                 "/usr/lpp/mmfs/bin/mmchlicense client -N $HOSTNAME --accept \n",

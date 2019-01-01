@@ -37,14 +37,14 @@
                         "RDGWSG"
                     ]
                 },
-				{
-					"Label": {
-					"default": "Storage Stack:"
-					},
-					"Parameters": [
-					"StorageStack"
-					]
-				},
+                {
+                    "Label": {
+                        "default": "Storage Stack:"
+                    },
+                    "Parameters": [
+                        "StorageStack"
+                    ]
+                },
                 {
                     "Label": {
                         "default": "GPFS EC2 Configurations:"
@@ -205,22 +205,22 @@
             "Type": "String"
         },
         "SASPlanFiles": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "must be a folder of planfiles in S3 location, e.g. mysasbucket/sasplanfiles/",
-             "Description": "S3 location of the folder with the SAS Plan files",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be a folder of planfiles in S3 location, e.g. mysasbucket/sasplanfiles/",
+            "Description": "S3 location of the folder with the SAS Plan files",
+            "Type": "String"
         },
         "SASLicenseMeta": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "must be file name containing the SAS Metadata license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
-             "Description": "Name of SAS Metadata License file",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Metadata license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Metadata License file",
+            "Type": "String"
         },
         "SASLicenseApp": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "must be file name containing the SAS Application Server license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
-             "Description": "Name of SAS Application Server License file",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Application Server license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Application Server License file",
+            "Type": "String"
         },
         "StorageKeyPairName": {
             "Description": "Name of an existing EC2 Key Pair.",
@@ -279,7 +279,7 @@
             "Description": "Select the Subnet ID of a private subnet 2 located in Availability Zone 1.",
             "Type": "AWS::EC2::Subnet::Id"
         },
-		"PrivateSubnet3ID": {
+        "PrivateSubnet3ID": {
             "Description": "Select the Subnet ID of a private subnet 3 located in Availability Zone 2.",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -476,10 +476,14 @@
         "AnsiblePublicKey": {
             "Type": "AWS::SSM::Parameter",
             "Properties": {
-              "Name": { "Fn::Sub":  "sas-grid-ansiblekey-${AWS::StackName}" },
-              "Description": { "Fn::Sub": "sas-grid-ansiblekey-${AWS::StackName}" },
-              "Type": "String",
-              "Value": "dummy"
+                "Name": {
+                    "Fn::Sub": "sas-grid-ansiblekey-${AWS::StackName}"
+                },
+                "Description": {
+                    "Fn::Sub": "sas-grid-ansiblekey-${AWS::StackName}"
+                },
+                "Type": "String",
+                "Value": "dummy"
             }
         },
         "LustreStack": {
@@ -738,7 +742,7 @@
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                       "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template.yaml",
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template.yaml",
                         {
                             "QSS3Region": {
                                 "Fn::If": [
@@ -873,14 +877,14 @@
     "Mappings": {
         "Parameters": {
             "GPFS": {
-				"BlockSize": "256K",
-				"DataReplica": "2",
-				"GpfsMountPoint": "/gpfs/sasgrid",
-				"EBSType": "st1",
-				"DiskSize": "500",
-				"ServerInstanceType": "t2.large",
-				"ComputeInstanceType": "t2.small",
-				"ComputeNodeCount": "1"
+                "BlockSize": "256K",
+                "DataReplica": "2",
+                "GpfsMountPoint": "/gpfs/sasgrid",
+                "EBSType": "st1",
+                "DiskSize": "500",
+                "ServerInstanceType": "t2.large",
+                "ComputeInstanceType": "t2.small",
+                "ComputeNodeCount": "1"
             }
         }
     }
