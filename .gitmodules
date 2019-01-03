@@ -4,3 +4,6 @@
 [submodule "submodules/quickstart-microsoft-rdgateway"]
 	path = submodules/quickstart-microsoft-rdgateway
 	url = https://github.com/aws-quickstart/quickstart-microsoft-rdgateway
+[submodule "submodules/quickstart-ibm-spectrum-scale"]
+	path = submodules/quickstart-ibm-spectrum-scale
+	url = https://github.com/aws-quickstart/quickstart-ibm-spectrum-scale.git
