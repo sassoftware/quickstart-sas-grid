@@ -750,7 +750,7 @@
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template.yaml",
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template",
                         {
                             "QSS3Region": {
                                 "Fn::If": [
@@ -880,7 +880,7 @@
                     }
                 }
             },
-			"Condition": "RunGPFSStack"
+           "Condition": "RunGPFSStack"
         }
     },
     "Mappings": {
