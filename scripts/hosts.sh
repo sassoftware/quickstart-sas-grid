@@ -26,47 +26,58 @@ fi
 
 # get parent stack
 PARENT_STACK=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stacks --stack-name "{{CloudFormationStack}}" --query 'Stacks[].ParentId' --output text)
+PARENT_STACK_NAME=$(aws --region "{{AWSRegion}}" cloudformation describe-stacks --stack-name "$PARENT_STACK" --query 'Stacks[].StackName' --output text)
 
 #
-# Lustre substack
+# Storage substack
 #
+# If LUSTRE_STACK_ID is not empty, then we have a deployment using Lustre.  Otherwise we should have a deployment using GPFS.
+STORAGE_STACK_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name "$PARENT_STACK_NAME" --logical-resource-id "LustreStack" --query 'StackResources[*].PhysicalResourceId' --output text)
+GRID_STACK_NAME="SASGridStack"
+if [ -z "$STORAGE_STACK_ID" ]
+then
+    STORAGE_STACK_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name "$PARENT_STACK_NAME" --logical-resource-id "GPFSStack" --query 'StackResources[*].PhysicalResourceId' --output text)
+    GRID_STACK_NAME="GPFSSASGrid"
+fi
 
-# wait for lustre substack to be complete
-LUSTRE_STACK=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name "$PARENT_STACK" --logical-resource-id "LustreStack"  --query StackResources[*].PhysicalResourceId --output text)
+# wait for storage substack to be complete
 STATUS='status'
 until [ 1 == "$(echo "$STATUS" | grep "CREATE_COMPLETE" | wc -w)" ]; do
   sleep 10
-  STATUS=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stacks --stack-name "$LUSTRE_STACK"  --query Stacks[*].StackStatus --output text)
+  STATUS=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stacks --stack-name "$STORAGE_STACK_ID"  --query Stacks[*].StackStatus --output text)
   if [ "$(echo "$STATUS" | grep "CREATE_FAILED")" ]; then exit 1; fi
 done
 
-# MGTNode
-MGTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $LUSTRE_STACK  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MGTNode`].PhysicalResourceId' --output text)
-MGTNode_IP=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$MGTNode_ID" --query Reservations[*].Instances[*].PrivateIpAddress --output text)
-echo "${MGTNode_IP} mgtnode1 mgtnode1.{{DomainDNSName}}" >> $TMPHOSTSFILE
-echo "mgtnode1 ansible_host=${MGTNode_IP}" >> $TMPANSIBLEHEADER
-#sed -i "/^\[mgtnode\]/a mgtnode1" $INVENTORYBODY
+if [ "$GRID_STACK_NAME" == "SASGridStack"]
+then
+  # MGTNode
+  MGTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MGTNode`].PhysicalResourceId' --output text)
+  MGTNode_IP=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$MGTNode_ID" --query Reservations[*].Instances[*].PrivateIpAddress --output text)
+  echo "${MGTNode_IP} mgtnode1 mgtnode1.{{DomainDNSName}}" >> $TMPHOSTSFILE
+  echo "mgtnode1 ansible_host=${MGTNode_IP}" >> $TMPANSIBLEHEADER
+  #sed -i "/^\[mgtnode\]/a mgtnode1" $INVENTORYBODY
 
-# MDTNode
-MDTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $LUSTRE_STACK  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MDTNode`].PhysicalResourceId' --output text)
-MDTNode_IP=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$MDTNode_ID" --query Reservations[*].Instances[*].PrivateIpAddress --output text)
-echo "${MDTNode_IP} mdtnode1 mdtnode1.{{DomainDNSName}}" >> $TMPHOSTSFILE
-echo "mdtnode1 ansible_host=${MDTNode_IP}" >> $TMPANSIBLEHEADER
-#sed -i "/^\[mdtnode\]/a mdtnode1" $INVENTORYBODY
+  # MDTNode
+  MDTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MDTNode`].PhysicalResourceId' --output text)
+  MDTNode_IP=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$MDTNode_ID" --query Reservations[*].Instances[*].PrivateIpAddress --output text)
+  echo "${MDTNode_IP} mdtnode1 mdtnode1.{{DomainDNSName}}" >> $TMPHOSTSFILE
+  echo "mdtnode1 ansible_host=${MDTNode_IP}" >> $TMPANSIBLEHEADER
+  #sed -i "/^\[mdtnode\]/a mdtnode1" $INVENTORYBODY
 
-# OSS Nodes
-OSS_IDs=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $LUSTRE_STACK  --query 'StackResources[?LogicalResourceId == `OSSEC2Instances`].PhysicalResourceId' --output text)
-# this value has the oss VM ids separated by ":". Convert it into an array
-IFS=':' read -r -a array <<< "$OSS_IDs"
-for id in "${array[@]}"
-do
-  OSSNode_IP=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$id" --query Reservations[*].Instances[*].PrivateIpAddress --output text)
-  OSSNode_Name=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$id" --query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value' --output text) 
-  OSSNode_Name_Only="$(echo ${OSSNode_Name} | cut -f1 -d '.')"
-  echo "$OSSNode_IP $OSSNode_Name_Only $OSSNode_Name" >> $TMPHOSTSFILE
-  echo "$OSSNode_Name_Only ansible_host=${OSSNode_IP}" >> $TMPANSIBLEHEADER
-  #sed -i "/^\[ossnode\]/a $OSSNode_Name_Only" $INVENTORYBODY
-done
+  # OSS Nodes
+  OSS_IDs=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?LogicalResourceId == `OSSEC2Instances`].PhysicalResourceId' --output text)
+  # this value has the oss VM ids separated by ":". Convert it into an array
+  IFS=':' read -r -a array <<< "$OSS_IDs"
+  for id in "${array[@]}"
+  do
+    OSSNode_IP=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$id" --query Reservations[*].Instances[*].PrivateIpAddress --output text)
+    OSSNode_Name=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$id" --query 'Reservations[*].Instances[*].Tags[?Key==`Name`].Value' --output text)
+    OSSNode_Name_Only="$(echo ${OSSNode_Name} | cut -f1 -d '.')"
+    echo "$OSSNode_IP $OSSNode_Name_Only $OSSNode_Name" >> $TMPHOSTSFILE
+    echo "$OSSNode_Name_Only ansible_host=${OSSNode_IP}" >> $TMPANSIBLEHEADER
+    #sed -i "/^\[ossnode\]/a $OSSNode_Name_Only" $INVENTORYBODY
+  done
+fi
 
 #
 # SAS Grid substack
@@ -76,7 +87,7 @@ done
 SAS_STACK=
 until [ -n "$SAS_STACK" ]; do
   sleep 10
-  SAS_STACK=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name "$PARENT_STACK" --logical-resource-id "SASGridStack"  --query StackResources[*].PhysicalResourceId --output text)
+  SAS_STACK=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name "$PARENT_STACK" --logical-resource-id "$GRID_STACK_NAME"  --query StackResources[*].PhysicalResourceId --output text)
 done
 # wait for sasgrid substack to be be complete
 STATUS='status'
@@ -129,4 +140,3 @@ cat $TMPANSIBLEHEADER $INVENTORYBODY > /tmp/inventory.ini
 # update lsf config file with gridhostsN-1
 SECONDARY_GRIDNODES=$(cat /etc/hosts | cut -d' ' -f3 | grep sasgrid[0-9] | sort | tail -n +2 | xargs)
 sed -i "s/SECONDARY_GRIDNODES/${SECONDARY_GRIDNODES}/" /tmp/lsf_install.config
-
