@@ -879,7 +879,8 @@
                         ]
                     }
                 }
-            }
+            },
+			"Condition": "RunGPFSStack"
         }
     },
     "Mappings": {
