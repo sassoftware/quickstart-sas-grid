@@ -48,7 +48,7 @@ until [ 1 == "$(echo "$STATUS" | grep "CREATE_COMPLETE" | wc -w)" ]; do
   if [ "$(echo "$STATUS" | grep "CREATE_FAILED")" ]; then exit 1; fi
 done
 
-if [ "$GRID_STACK_NAME" == "SASGridStack"]
+if [ "$GRID_STACK_NAME" == "SASGridStack" ]
 then
   # MGTNode
   MGTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MGTNode`].PhysicalResourceId' --output text)
@@ -76,6 +76,30 @@ then
     echo "$OSSNode_IP $OSSNode_Name_Only $OSSNode_Name" >> $TMPHOSTSFILE
     echo "$OSSNode_Name_Only ansible_host=${OSSNode_IP}" >> $TMPANSIBLEHEADER
     #sed -i "/^\[ossnode\]/a $OSSNode_Name_Only" $INVENTORYBODY
+  done
+elif [ "$GRID_STACK_NAME" == "GPFSSASGrid" ]
+then
+  #gpfsserver1
+  #gpfsserver2
+  #gpfscompute1
+
+  # Compute Node
+  Compute_ID=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ComputeSecurityGroup- | cut -d'"' -f4 --output text)
+  Compute_IP=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Compute_ID" --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
+  echo "${Compute_IP} gpfscompute1 gpfscompute1.{{DomainDNSName}}" >> $TMPHOSTSFILE
+  echo "gpfscompute1 ansible_host=${Compute_IP}" >> $TMPANSIBLEHEADER
+  #sed -i "/^\[gpfscompute\]/a gpfscompute1" $INVENTORYBODY
+
+  # Server Nodes
+  Server_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ServerSecurityGroup- | cut -d'"' -f4 --output text)
+  Server_IPs=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Server_SG" --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
+  count=0
+  declare -a array=($Server_IPs)
+  for id in "${array[@]}"; do
+    count=$((count+1))
+    echo "$id gpfsserver$count gpfsserver$count.{{DomainDNSName}}" >> $TMPHOSTSFILE
+    echo "gpfsserver$count ansible_host=$id" >> $TMPANSIBLEHEADER
+    #sed -i "/^\[gpfsserver\]/a gpfsserver.$count" $INVENTORYBODY
   done
 fi
 

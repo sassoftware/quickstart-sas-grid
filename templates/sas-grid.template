@@ -813,6 +813,9 @@
                     },
                     "AdminPassword": {
                         "Ref": "AdminPassword"
+                    },
+                    "StorageStack": {
+                        "Ref": "StorageStack"
                     }
                 }
             }

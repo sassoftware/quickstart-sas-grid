@@ -103,12 +103,6 @@
     -  /tmp/quickstart/playbooks/vars.yml
 
   tasks:
-  - name: change permissions on /sas directory              
-    file:
-      path: /sas
-      state: directory
-      mode: 0777
-
   - name: create directory quickstart and set permssions
     file:
       path: /sas/quickstart
