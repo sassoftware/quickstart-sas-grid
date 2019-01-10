@@ -79,10 +79,6 @@ then
   done
 elif [ "$GRID_STACK_NAME" == "GPFSSASGrid" ]
 then
-  #gpfsserver1
-  #gpfsserver2
-  #gpfscompute1
-
   # Compute Node
   Compute_ID=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ComputeSecurityGroup- | cut -d'"' -f4 --output text)
   Compute_IP=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Compute_ID" --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
