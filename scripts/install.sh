@@ -34,6 +34,7 @@ AWSRegion: "{{{AWSRegion}}}"
 EOF
 
   # distribute additional /etc/hosts entries
+  ansible-playbook -vv update_gpfs.yml
   ansible-playbook -vv update_hosts.yml
 
   # create users, set ulimits, create directories

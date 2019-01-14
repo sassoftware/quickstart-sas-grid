@@ -4,26 +4,6 @@
   become_user: sasinst
 
   tasks:
-  - name: stop sas services
-    shell: |
-      . /usr/local/config/Lev1/sas.servers stop
-
-- hosts: sasgridnodes
-  become: yes
-  become_user: sasinst
-
-  tasks:
-  - name: stop sas services
-    shell: |
-      . /sas/config/Lev1/sas.servers stop
-[ec2-user@ip-10-0-143-18 tmp]$ ^C
-[ec2-user@ip-10-0-143-18 tmp]$ cat sas_servers_start.yml
----
-- hosts: sasgridmeta1
-  become: yes
-  become_user: sasinst
-
-  tasks:
   - name: start sas services
     shell: |
       rm /sas/config/Lev1/Web/gemfire/instances/ins_41415/locator41415state.dat 2> /dev/null

@@ -1,0 +1,29 @@
+---
+- hosts: gpfs-all
+  gather_facts: no
+  become: yes
+  become_user: root
+  vars_files:
+    -  /tmp/quickstart/playbooks/vars.yml
+
+  tasks:
+  - name: copy id_rsa file
+    # this file has been seeded with the correct hosts list in hosts.sh
+    copy:
+      src: /home/ec2-user/.ssh/id_rsa
+      dest: /home/ec2-user/.ssh/id_rsa
+      mode: 0600
+
+  - name: copy id_rsa.pub file
+    # this file has been seeded with the correct hosts list in hosts.sh
+    copy:
+      src: /home/ec2-user/.ssh/id_rsa.pub
+      dest: /home/ec2-user/.ssh/id_rsa.pub
+      mode: 0644
+
+  - name: copy authorized keys file
+    # this file has been seeded with the correct hosts list in hosts.sh
+    copy:
+      src: /home/ec2-user/.ssh/authorized_keys
+      dest: /home/ec2-user/.ssh/authorized_keys
+      mode: 0600

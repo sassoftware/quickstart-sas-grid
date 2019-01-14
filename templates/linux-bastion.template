@@ -501,6 +501,14 @@
                                 "owner": "ec2-user",
                                 "group": "ec2-user"
                             },
+                            "/tmp/update_gpfs.yml": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/update_gpfs.yml"
+                                },
+                                "mode": "000660",
+                                "owner": "ec2-user",
+                                "group": "ec2-user"
+                            },
                             "/tmp/prereqs.yml": {
                                 "source": {
                                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/prereqs.yml"

@@ -19,22 +19,44 @@ then
     GRID_STACK_NAME="GPFSSASGrid"
 fi
 
-# MGTNode
-MGTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MGTNode`].PhysicalResourceId' --output text)
-echo "$MGTNode_ID" > /tmp/mylist
+if [ "$GRID_STACK_NAME" == "SASGridStack" ]
+then
+    # MGTNode
+    MGTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MGTNode`].PhysicalResourceId' --output text)
+    echo "$MGTNode_ID" > /tmp/mylist
 
-# MDTNode
-MDTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MDTNode`].PhysicalResourceId' --output text)
-echo "$MDTNode_ID" >> /tmp/mylist
+    # MDTNode
+    MDTNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `MDTNode`].PhysicalResourceId' --output text)
+    echo "$MDTNode_ID" >> /tmp/mylist
 
-# OSS Nodes
-OSS_IDs=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?LogicalResourceId == `OSSEC2Instances`].PhysicalResourceId' --output text)
-# this value has the oss VM ids separated by ":". Convert it into an array
-IFS=':' read -r -a array <<< "$OSS_IDs"
-for id in "${array[@]}"
-do
-  echo "$id" >> /tmp/mylist
-done
+    # OSS Nodes
+    OSS_IDs=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $STORAGE_STACK_ID  --query 'StackResources[?LogicalResourceId == `OSSEC2Instances`].PhysicalResourceId' --output text)
+
+    # this value has the oss VM ids separated by ":". Convert it into an array
+    IFS=':' read -r -a array <<< "$OSS_IDs"
+    for id in "${array[@]}"
+    do
+      echo "$id" >> /tmp/mylist
+    done
+elif [ "$GRID_STACK_NAME" == "GPFSSASGrid" ]
+then
+    # GPFS Compute Node
+    Compute_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ComputeSecurityGroup- | cut -d'"' -f4 --output text)
+    Compute_ID=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Compute_SG" --query 'Reservations[*].Instances[*].InstanceId[]' --output text)
+    echo "$Compute_ID" > /tmp/mylist
+
+    # GPFS Server Nodes
+    Server_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ServerSecurityGroup- | cut -d'"' -f4 --output text)
+    Server_IPs=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Server_SG" --query 'Reservations[*].Instances[*].InstanceId[]' --output text)
+
+    # this value has the oss VM ids separated by ":". Convert it into an array
+    count=0
+    declare -a array=($Server_IPs)
+    for id in "${array[@]}"; do
+      count=$((count+1))
+      echo "$id" >> /tmp/mylist
+    done
+fi
 
 # SAS Grid substack
 SAS_STACK=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name "$PARENT_STACK" --logical-resource-id "$GRID_STACK_NAME"  --query StackResources[*].PhysicalResourceId --output text)
