@@ -443,7 +443,7 @@
             "CreationPolicy": {
                 "ResourceSignal": {
                     "Count": 1,
-                    "Timeout": "PT2H30M"
+                    "Timeout": "PT3H30M"
                 }
             },
             "Metadata": {
