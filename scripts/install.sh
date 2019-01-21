@@ -48,4 +48,10 @@ EOF
   # install sas
   ansible-playbook -vvv sas_install_metadata.yml
   ansible-playbook -vvv sas_install_grid1.yml
+
+  # distribute additional /etc/hosts entries
+  ansible-playbook -vv update_hosts_storage.yml
+
+  # create users, set ulimits, create directories
+  ansible-playbook -vv prereqs_storage.yml # use triple mustache to avoid url encoding
 popd
