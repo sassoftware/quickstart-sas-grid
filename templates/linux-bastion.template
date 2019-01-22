@@ -476,23 +476,6 @@
                                 "owner": "ec2-user",
                                 "group": "ec2-user"
                             },
-                            "/tmp/inventory.body": {
-                                "source": {
-                                    "Fn::If" : [
-                                        "GetLustreFile",
-                                        { "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/inventory_lustre.body" },
-                                        { "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/inventory_gpfs.body" }
-                                    ]
-                                },
-                                "mode": "000660",
-                                "owner": "ec2-user",
-                                "group": "ec2-user",
-                                "context": {
-                                    "StorageStack": {
-                                        "Ref": "StorageStack"
-                                    }
-                                }
-                            },
                             "/tmp/update_hosts.yml": {
                                 "source": {
                                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/update_hosts.yml"
