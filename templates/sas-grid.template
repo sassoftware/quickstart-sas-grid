@@ -6,7 +6,7 @@
             "ParameterGroups": [
                 {
                     "Label": {
-                        "default": "SAS Grid License Information"
+                        "default": "SAS Grid license information"
                     },
                     "Parameters": [
                         "SASSoftwareDepot",
@@ -18,7 +18,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Network Configuration"
+                        "default": "Network configuration"
                     },
                     "Parameters": [
                         "VPCID",
@@ -30,9 +30,11 @@
                 },
                 {
                     "Label": {
-                        "default": "Microsoft Remote Desktop Gateway Configuration"
+                        "default": "Linux bastion configuration"
                     },
                     "Parameters": [
+                        "AdminPassword",
+                        "AdminIngressLocation",
                         "DomainDNSName",
                         "RDGWSG"
                     ]
@@ -83,7 +85,7 @@
                 },
                 {
                     "Label": {
-                        "default": "SAS Grid EC2 Configuration"
+                        "default": "SAS Grid EC2 configuration"
                     },
                     "Parameters": [
                         "SASGridInstanceType",
@@ -93,7 +95,7 @@
                 },
                 {
                     "Label": {
-                        "default": "AWS Quick Start Configuration"
+                        "default": "AWS Quick Start configuration"
                     },
                     "Parameters": [
                         "QSS3BucketName",
@@ -106,19 +108,19 @@
                     "default": "Select the Storage Stack"
                 },
                 "SASSoftwareDepot": {
-                    "default": "SAS Software Depot tar file S3 folder location"
+                    "default": "SAS Software Depot tar file in S3"
                 },
                 "SASSoftwareDepotName": {
-                    "default": "SAS Software Depot Name minus .tar"
+                    "default": "SAS Software Depot name"
                 },
                 "SASPlanFiles": {
-                    "default": "SAS Software Plan Files folder S3 location"
+                    "default": "SAS plan files folder in S3"
                 },
                 "SASLicenseMeta": {
-                    "default": "SAS License file for Metadata Server"
+                    "default": "SAS Metadata Server license file"
                 },
                 "SASLicenseApp": {
-                    "default": "SAS License file for Application Server"
+                    "default": "SAS Application Server license file"
                 },
                 "VPCID": {
                     "default": "VPC ID"
@@ -127,43 +129,46 @@
                     "default": "VPC CIDR"
                 },
                 "PrivateSubnet1ID": {
-                    "default": "Private Subnet 1 ID"
+                    "default": "Private subnet 1 ID"
                 },
                 "PrivateSubnet2ID": {
-                    "default": "Private Subnet 2 ID"
+                    "default": "Private subnet 2 ID"
+                },
+                "PublicSubnet1ID": {
+                    "default": "Public subnet 1 ID"
                 },
                 "PrivateSubnet3ID": {
                     "default": "Private Subnet 3 ID"
                 },
                 "DomainDNSName": {
-                    "default": "Domain DNS Name"
+                    "default": "Domain DNS name"
                 },
                 "RDGWSG": {
-                    "default": "RDGW SG"
+                    "default": "RDGW security group ID"
                 },
                 "StorageKeyPairName": {
                     "default": "Storage KeyPair Name"
                 },
                 "LustreOSSEBSVolumeSize": {
-                    "default": "Lustre OSS EBS Volume Size"
+                    "default": "EBS volume size for Lustre OSS"
                 },
                 "NumberOfOSSNodes": {
-                    "default": "Number of OSS Nodes"
+                    "default": "Number of Lustre OSS nodes"
                 },
                 "SASGridKeyPairName": {
-                    "default": "SAS Grid KeyPair Name"
+                    "default": "SAS Grid key pair name"
                 },
                 "SASGridInstanceType": {
-                    "default": "Instance type for SASGrid Instances"
+                    "default": "Instance type for SAS Grid instances"
                 },
                 "NoOfSASGridInstances": {
-                    "default": "Required number of SASGrid Instances"
+                    "default": "Required number of SAS Grid instances"
                 },
                 "QSS3BucketName": {
-                    "default": "Quick Start S3 Bucket Name"
+                    "default": "Quick Start S3 bucket Name"
                 },
                 "QSS3KeyPrefix": {
-                    "default": "Quick Start S3 Key Prefix"
+                    "default": "Quick Start S3 key prefix"
                 },
                 "LustreEBSVolumeType": {
                     "default": "EBS Volumes type for Lustre Instances"
@@ -194,14 +199,14 @@
         },
         "SASSoftwareDepot": {
             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-            "ConstraintDescription": "must be a tar file in a valid S3 location, e.g. mysasbucket/sasorders",
-            "Description": "S3 folder location of the Software Depot tar file",
+            "ConstraintDescription": "Must be a tar file in a valid S3 location, e.g. mysasbucket/sasorders",
+            "Description": "S3 folder location of the Software Depot tar file.",
             "Type": "String"
         },
         "SASSoftwareDepotName": {
             "AllowedPattern": "^[0-9a-zA-Z-_/]*$",
-            "ConstraintDescription": "Name of SAS Software Depot minus .tar, e.g. SASSoftwareDepot_Final",
-            "Description": "Name of the Software Depot tar file minus .tar",
+            "ConstraintDescription": "Name of SAS Software Depot minus .tar, e.g. SASSoftwareDepot_Final.",
+            "Description": "Name of the Software Depot tar file without the .tar extension.",
             "Type": "String"
         },
         "SASPlanFiles": {
@@ -226,24 +231,26 @@
             "Description": "Name of an existing EC2 Key Pair.",
             "Type": "AWS::EC2::KeyPair::KeyName",
             "MinLength": "1",
-            "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
+            "ConstraintDescription": "Must be the name of an existing EC2 key pair."
         },
         "DomainDNSName": {
             "AllowedPattern": "[a-zA-Z0-9]+\\..+",
-            "Description": "Fully qualified domain name (FQDN) of the forest root domain e.g. example.com",
+            "Description": "Fully qualified domain name (FQDN) of the forest root domain, e.g. example.com.",
+            "Default": "example.com",
             "MaxLength": "25",
             "MinLength": "3",
             "Type": "String"
         },
         "RDGWSG": {
-            "Description": "ID of the Security Group (e.g., sg-0343606e)",
+            "Description": "ID of the RD Gateway security group (e.g., sg-0343606e).",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
         "SASGridKeyPairName": {
-            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "SASGridInstanceType": {
+            "Description": "The EC2 instance type for SAS Grid instances.",
             "Type": "String",
             "Default": "i3.8xlarge",
             "AllowedValues": [
@@ -251,32 +258,32 @@
             ]
         },
         "NoOfSASGridInstances": {
-            "Description": "Provide the number of SASGrid instances are required",
+            "Description": "The number of SAS Grid instances that are required (2-20).",
             "Type": "Number",
             "MinValue": "2",
             "MaxValue": "20",
             "Default": "2"
         },
         "LustreOSSEBSVolumeSize": {
-            "Description": "EBS volume size (in GiB) for Lustre OSS nodes. You can specify 100-9900 GiB.?Provide size (in GiB) for Lustre OSS Data Volume in multiples of 100. Volume size for each OSS node will be assigned based on the input provided here",
+            "Description": "EBS volume size (in GiB) for Lustre OSS nodes. You can specify 100-9900 GiB. Provide the size (in GiB) for Lustre OSS data volume in multiples of 100. Volume size for each OSS node will be assigned based on the input provided here.",
             "Type": "String",
             "MinLength": "3",
             "MaxLength": "4",
             "Default": "100"
         },
         "NumberOfOSSNodes": {
-            "Description": "Provide the number of OSS Node instances are required",
+            "Description": "The number of Lustre OSS node instances that are required (3-15).",
             "Type": "Number",
             "MinValue": "3",
             "MaxValue": "15",
             "Default": "3"
         },
         "PrivateSubnet1ID": {
-            "Description": "Select the Subnet ID of a private subnet 1 located in Availability Zone 1.",
+            "Description": "Select the subnet ID of private subnet 1 located in Availability Zone 1.",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet2ID": {
-            "Description": "Select the Subnet ID of a private subnet 2 located in Availability Zone 1.",
+            "Description": "Select the subnet ID of private subnet 2 located in Availability Zone 1.",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet3ID": {
@@ -284,7 +291,7 @@
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PublicSubnet1ID": {
-            "Description": "Select the Subnet ID of a public subnet 1.",
+            "Description": "Select the subnet ID of public subnet 1 located in Availability Zone 1.",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "QSS3BucketName": {
@@ -302,6 +309,7 @@
             "Type": "String"
         },
         "LustreEBSVolumeType": {
+            "Description": "EBS volume type for Lustre OSS nodes.",
             "Type": "String",
             "Default": "gp2",
             "AllowedValues": [
@@ -313,24 +321,24 @@
             ]
         },
         "VPCID": {
-            "Description": "Select the ID of an existing VPC",
+            "Description": "The ID of an existing VPC.",
             "Type": "AWS::EC2::VPC::Id"
         },
         "VPCCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.0.0/16",
-            "Description": "CIDR Block for the VPC",
+            "Description": "CIDR block for the VPC",
             "Type": "String"
         },
         "AdminIngressLocation": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-32",
-            "Description": "Allow admin access for this CIDR Block",
+            "Description": "Allowed CIDR block for external access to the Linux bastion host.",
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "Password for the administrative account. Must be at least 8 characters containing letters, numbers and symbols",
+            "Description": "Password for the administrative account. Must be at least 8 characters containing letters, numbers and symbols.",
             "Type": "String",
             "MinLength": "8",
             "MaxLength": "32",
@@ -742,7 +750,7 @@
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template.yaml",
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template",
                         {
                             "QSS3Region": {
                                 "Fn::If": [
@@ -805,6 +813,9 @@
                     },
                     "AdminPassword": {
                         "Ref": "AdminPassword"
+                    },
+                    "StorageStack": {
+                        "Ref": "StorageStack"
                     }
                 }
             }
@@ -872,7 +883,7 @@
                     }
                 }
             },
-			"Condition": "RunGPFSStack"
+           "Condition": "RunGPFSStack"
         }
     },
     "Mappings": {

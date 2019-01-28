@@ -1,5 +1,5 @@
 ---
-- hosts: sasgrid-all
+- hosts: sas-all
   become: yes
   become_user: root
   vars_files:
@@ -16,6 +16,7 @@
       name: sas
       gid: 1003
       state: present
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "sasinst" exists, set password
     user:
@@ -23,6 +24,7 @@
       uid: 501
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "lsfadmin" exists, set password
     user:
@@ -30,6 +32,7 @@
       uid: 502
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "sas" exists, set password
     user:
@@ -37,6 +40,7 @@
       uid: 503
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "sasdemo" exists, set password
     user:
@@ -44,6 +48,7 @@
       uid: 504
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "sassrv" exists, set password
     user:
@@ -51,6 +56,7 @@
       uid: 505
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "sastrust" exists, set password
     user:
@@ -58,6 +64,7 @@
       uid: 506
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "sasadm" exists, set password
     user:
@@ -65,6 +72,7 @@
       uid: 507
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "sasevs" exists, set password
     user:
@@ -72,6 +80,7 @@
       uid: 508
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Ensure user "webanon" exists, set password
     user:
@@ -79,66 +88,4 @@
       uid: 509
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
-
-  #
-  # set ulimits on all hosts
-  #
-
-  - name: add ulimits
-    blockinfile:
-      dest: /etc/security/limits.conf
-      marker: '# {mark} increase nofile and number of open processes limits for sas account'
-      insertafter: 'EOF'
-      block: |
-        @sas             hard    nofile          20480
-        @sas             soft    nofile          20480
-        @sas             hard    nproc           20480
-        @sas             soft    nproc           20480
-    when: "inventory_hostname in groups['sasgrid-all']"
-
-- hosts: sasgrid1
-  become: yes
-  become_user: root
-  vars_files:
-    -  /tmp/quickstart/playbooks/vars.yml
-
-  tasks:
-  - name: create directory quickstart and set permssions
-    file:
-      path: /sas/quickstart
-      state: directory
-      owner: sasinst
-      group: sas
-      mode: 0777
-
-  - name: create directory gms_install and set permssions
-    file:
-      path: /sas/gms_install
-      state: directory
-      owner: lsfadmin
-      group: sas
-      mode: 0755
-
-  - name: create directory pm_install and set permssions
-    file:
-      path: /sas/pm_install
-      state: directory
-      owner: lsfadmin
-      group: sas
-      mode: 0755
-
-  - name: create directory grid and set permssions
-    file:
-      path: /sas/grid
-      state: directory
-      owner: sasinst
-      group: sas
-      mode: 0777
-
-  - name: create directory studioconfig and set permssions
-    file:
-      path: /sas/studioconfig
-      state: directory
-      owner: sasinst
-      group: sas
-      mode: 0777
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"

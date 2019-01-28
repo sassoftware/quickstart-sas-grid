@@ -6,7 +6,7 @@
             "ParameterGroups": [
                 {
                     "Label": {
-                        "default": "SAS Grid License Information"
+                        "default": "SAS Grid license information"
                     },
                     "Parameters": [
                         "SASSoftwareDepot",
@@ -18,7 +18,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Network Configuration"
+                        "default": "Network configuration"
                     },
                     "Parameters": [
                         "AvailabilityZones",
@@ -33,7 +33,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Microsoft Remote Desktop Gateway Configuration"
+                        "default": "Microsoft RD Gateway configuration"
                     },
                     "Parameters": [
                         "RDGWKeyPairName",
@@ -90,7 +90,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Lustre EC2 Configuration"
+                        "default": "Lustre EC2 configuration"
                     },
                     "Parameters": [
                         "LustreKeyPairName",
@@ -101,7 +101,7 @@
                 },
                 {
                     "Label": {
-                        "default": "AWS Quick Start Configuration"
+                        "default": "AWS Quick Start configuration"
                     },
                     "Parameters": [
                         "QSS3BucketName",
@@ -114,49 +114,49 @@
                     "default": "Select the Storage Stack"
                 },
                 "SASSoftwareDepot": {
-                    "default": "SAS Software Depot tar file S3 location"
+                    "default": "SAS Software Depot tar file in S3"
                 },
                 "SASSoftwareDepotName": {
-                    "default": "SAS Software Depot Name"
+                    "default": "SAS Software Depot name"
                 },
                 "SASPlanFiles": {
-                    "default": "SAS Software Plan Files folder S3 location"
+                    "default": "SAS plan files folder in S3"
                 },
                 "SASLicenseMeta": {
-                    "default": "SAS License file for Metadata Server"
+                    "default": "SAS Metadata Server license file"
                 },
                 "SASLicenseApp": {
-                    "default": "SAS License file for Application Server"
+                    "default": "SAS Application Server license file"
                 },
                 "AvailabilityZones": {
                     "default": "Availability Zones"
                 },
                 "AdminPassword": {
-                    "default": "Admin Password"
+                    "default": "Admin password"
                 },
                 "AdminUser": {
-                    "default": "Admin User Name"
+                    "default": "Admin user name"
                 },
                 "DomainDNSName": {
-                    "default": "Domain DNS Name"
+                    "default": "Domain DNS name"
                 },
                 "RDGWKeyPairName": {
-                    "default": "RDGW KeyPair Name"
+                    "default": "RDGW key pair name"
                 },
                 "SASGridKeyPairName": {
-                    "default": "SAS Grid KeyPair Name"
+                    "default": "SAS Grid key pair name"
                 },
                 "StorageKeyPairName": {
                     "default": "Storage KeyPair Name"
                 },
                 "LustreOSSEBSVolumeSize": {
-                    "default": "Lustre OSS EBS Volume Size"
+                    "default": "EBS volume size for Lustre OSS"
                 },
                 "LustreEBSVolumeType": {
-                    "default": "EBS Volumes type for Lustre Instances"
+                    "default": "EBS volume type for Lustre instances"
                 },
                 "NumberOfOSSNodes": {
-                    "default": "Number of OSS Nodes"
+                    "default": "Number of Lustre OSS nodes"
                 },
                 "PrivateSubnet1CIDR": {
                     "default": "Private Subnet 1(AZ1) CIDR"
@@ -171,28 +171,28 @@
                     "default": "Private Subnet 4(AZ2) CIDR"
                 },
                 "PublicSubnet1CIDR": {
-                    "default": "Public Subnet 1 CIDR"
+                    "default": "Public subnet 1 CIDR"
                 },
                 "PublicSubnet2CIDR": {
-                    "default": "Public Subnet 2 CIDR"
+                    "default": "Public subnet 2 CIDR"
                 },
                 "QSS3BucketName": {
-                    "default": "Quick Start S3 Bucket Name"
+                    "default": "Quick Start S3 bucket name"
                 },
                 "QSS3KeyPrefix": {
-                    "default": "Quick Start S3 Key Prefix"
+                    "default": "Quick Start S3 key prefix"
                 },
                 "RDGWInstanceType": {
-                    "default": "RDGW Instance Type"
+                    "default": "RDGW instance type"
                 },
                 "RDGWCIDR": {
-                    "default": "Allowed RDGW External Access CIDR"
+                    "default": "Allowed RDGW external access CIDR"
                 },
                 "VPCCIDR": {
                     "default": "VPC CIDR"
                 },
                 "SASGridInstanceType": {
-                    "default": "Instance Type for SASGrid Instances"
+                    "default": "Instance type for SAS Grid instances"
                 },
                 "NoOfSASGridInstances": {
                     "default": "Required No of SASGrid Instances"
@@ -216,13 +216,13 @@
         "SASSoftwareDepot": {
             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
             "ConstraintDescription": "must be a tar file in a valid S3 location, e.g. mysasbucket/sasorders/mydepot.tar",
-            "Description": "S3 file location of the Software Depot tar file.For e.g. If the SAS Software depot tar file is uploaded to S3 bucket location '<<s3-bucket-name>>/sas-depot', please enter '<<s3-bucket-name>>/sas-depot'",
+            "Description": "S3 file location of the Software Depot tar file. For example, if the tar file is uploaded to S3 bucket location s3-bucket-name/sas-depot, please enter s3-bucket-name/sas-depot.",
             "Type": "String"
         },
         "SASSoftwareDepotName": {
             "AllowedPattern": "^[0-9a-zA-Z-_/]*$",
             "ConstraintDescription": "Name of SAS Software Depot minus .tar, e.g. SASSoftwareDepot_Final",
-            "Description": "Name of the Software Depot tar file minus .tar.If you have uploaded SASSoftwareDepot_Final.tar please enter SASSoftwareDepot_Final",
+            "Description": "Name of the Software Depot tar file minus .tar. If you have uploaded SASSoftwareDepot_Final.tar, enter SASSoftwareDepot_Final.",
             "Type": "String"
         },
         "SASPlanFiles": {
@@ -244,14 +244,14 @@
             "Type": "String"
         },
         "AdminPassword": {
-            "Description": "Password for the administrative account. Must be at least 8 characters containing letters, numbers and symbols",
+            "Description": "Password for the administrative account. Must be at least 8 characters containing letters, numbers and symbols.",
             "Type": "String",
             "MinLength": "8",
             "MaxLength": "32",
             "NoEcho": "true"
         },
         "AdminUser": {
-            "Description": "User name for the new local administrator account",
+            "Description": "User name for the new local administrator account.",
             "Type": "String",
             "Default": "StackAdmin",
             "MinLength": "5",
@@ -259,13 +259,13 @@
             "AllowedPattern": "[a-zA-Z0-9]*"
         },
         "AvailabilityZones": {
-            "Description": "List of Availability Zones to use for the subnets in the VPC. PLEASE SELECT MINIMUM OF 2 AVAILABILITY ZONES",
+            "Description": "List of Availability Zones to use for the subnets in the VPC. PLEASE SELECT A MINIMUM OF 2 AVAILABILITY ZONES.",
             "Type": "List<AWS::EC2::AvailabilityZone::Name>"
         },
         "DomainDNSName": {
             "AllowedPattern": "[a-zA-Z0-9]+\\..+",
             "Default": "example.com",
-            "Description": "Fully qualified domain name (FQDN) of the forest root domain e.g. example.com",
+            "Description": "Fully qualified domain name (FQDN) of the forest root domain e.g. example.com.",
             "MaxLength": "25",
             "MinLength": "3",
             "Type": "String"
@@ -279,14 +279,15 @@
             ]
         },
         "RDGWKeyPairName": {
-            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "SASGridKeyPairName": {
-            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "SASGridInstanceType": {
+            "Description": "The EC2 instance type for SAS Grid instances.",
             "Type": "String",
             "Default": "i3.8xlarge",
             "AllowedValues": [
@@ -294,7 +295,7 @@
             ]
         },
         "NoOfSASGridInstances": {
-            "Description": "Provide the number of SASGrid instances are required",
+            "Description": "The number of SAS Grid instances that are required (2-20).",
             "Type": "Number",
             "MinValue": "2",
             "MaxValue": "20",
@@ -307,7 +308,7 @@
             "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
         },
         "LustreOSSEBSVolumeSize": {
-            "Description": "EBS volume size (in GiB) for Lustre OSS nodes. You can specify 100-9900 GiB. Provide size (in GiB) for Lustre OSS Data Volume in multiples of 100. Volume size for each OSS node will be assigned based on the input provided here",
+            "Description": "EBS volume size (in GiB) for Lustre OSS nodes. You can specify 100-9900 GiB. Provide size (in GiB) for Lustre OSS data volume in multiples of 100. Volume size for each OSS node will be assigned based on the input provided here.",
             "Type": "String",
             "MinLength": "3",
             "MaxLength": "4",
@@ -315,6 +316,7 @@
         },
         "LustreEBSVolumeType": {
             "Type": "String",
+            "Description": "EBS volume type for Lustre OSS nodes.",
             "Default": "gp2",
             "AllowedValues": [
                 "gp2",
@@ -325,7 +327,7 @@
             ]
         },
         "NumberOfOSSNodes": {
-            "Description": "Provide the number of Lustre OSS Node instances are required",
+            "Description": "The number of Lustre OSS node instances that are required (3-15).",
             "Type": "Number",
             "MinValue": "3",
             "MaxValue": "15",
@@ -363,14 +365,14 @@
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.128.0/20",
-            "Description": "CIDR Block for the public DMZ subnet 1(Remote desktop gateway) located in Availability Zone 1",
+            "Description": "CIDR block for the public DMZ subnet 1 (RD gateway) located in Availability Zone 1.",
             "Type": "String"
         },
         "PublicSubnet2CIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.144.0/20",
-            "Description": "CIDR block for the public DMZ subnet 2 located in Availability Zone 2",
+            "Description": "CIDR block for the public DMZ subnet 2 located in Availability Zone 2.",
             "Type": "String"
         },
         "QSS3BucketName": {
@@ -396,20 +398,20 @@
                 "m4.4xlarge"
             ],
             "Default": "t2.large",
-            "Description": "Amazon EC2 instance type for the bastion instances",
+            "Description": "Amazon EC2 instance type for the RD gateway instances.",
             "Type": "String"
         },
         "RDGWCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
-            "Description": "Allowed CIDR Block for external access to the Remote Desktop Gateways",
+            "Description": "Allowed CIDR block for external access to the RD gateways.",
             "Type": "String"
         },
         "VPCCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.0.0/16",
-            "Description": "CIDR Block for the VPC",
+            "Description": "CIDR block for the VPC.",
             "Type": "String"
         },
         "LicenseAgreementTerms": {
