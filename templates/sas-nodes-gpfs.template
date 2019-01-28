@@ -722,18 +722,18 @@
                                 "yum -y update \n",
                                 "yum-config-manager --enable rhui-REGION-rhel-server-optional \n",
                                 "yum -y install jq \n",
-                                "SERVERSGNAME=`aws ec2 --region $Region describe-security-groups | grep ServerSecurityGroup- | cut -d'\"' -f4` \n",
+                                {
+                                    "Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"
+                                },
+                                "PARENT_STACK_NAME=`aws --region $Region cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text`\n",
+                                "SERVERSGNAME=`aws ec2 --region $Region describe-security-groups | grep $PARENT_STACK_NAME | grep ServerSecurityGroup- | cut -d'\"' -f4` \n",
                                 "SERVERSGID=`aws ec2 --region $Region describe-security-groups --group-name --filters Name=group-name,Values=$SERVERSGNAME | jq .SecurityGroups[0].GroupId | cut -d'\"' -f2` \n",
-                                "COMPUTESGNAME=`aws ec2 --region $Region describe-security-groups | grep ComputeSecurityGroup- | cut -d'\"' -f4` \n",
+                                "COMPUTESGNAME=`aws ec2 --region $Region describe-security-groups | grep $PARENT_STACK_NAME | grep ComputeSecurityGroup- | cut -d'\"' -f4` \n",
                                 "COMPUTESGID=`aws ec2 --region $Region describe-security-groups --group-name --filters Name=group-name,Values=$COMPUTESGNAME | jq .SecurityGroups[0].GroupId | cut -d'\"' -f2` \n",
                                 "GRIDSGNAME=`aws ec2 --region $Region describe-security-groups | grep SASGridSG- | cut -d'\"' -f4` \n",
                                 "GRIDSGID=`aws ec2 --region $Region describe-security-groups --group-name --filters Name=group-name,Values=$GRIDSGNAME | jq .SecurityGroups[0].GroupId | cut -d'\"' -f2` \n",
                                 "aws ec2 --region $Region authorize-security-group-ingress --group-id $SERVERSGID --protocol -1 --source-group $GRIDSGID \n",
                                 "aws ec2 --region $Region authorize-security-group-ingress --group-id $COMPUTESGID --protocol -1 --source-group $GRIDSGID \n",
-                                {
-                                    "Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"
-                                },
-                                "PARENT_STACK_NAME=`aws --region $Region cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text`\n",
                                 "PRIVATE_KEY=ssh-key-private$PARENT_STACK_NAME-GPFSStack- \n",
                                 "PUBLIC_KEY=ssh-key-public$PARENT_STACK_NAME-GPFSStack- \n",
                                 "PRIVATE_SSH_KEYNAME=\n",
