@@ -492,12 +492,16 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "\n",
+                                {
+                                    "Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"
+                                },
+                                "PARENT_STACK_NAME=`aws --region $Region cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text`\n",
                                 "mkdir /nfs \n",
                                 "sed -i.bak s/PasswordAuthentication' 'no/PasswordAuthentication' 'yes/g /etc/ssh/sshd_config \n",
                                 "yum -y install http://dl.fedoraproject.org/pub/epel/7Server/x86_64/Packages/e/epel-release-7-11.noarch.rpm \n",
                                 "yum -y update \n",
                                 "yum-config-manager --enable rhui-REGION-rhel-server-optional \n",
-                                "yum -y install nfs-utils jq python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
+                                "yum -y install nc nfs-utils jq python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
                                 "yum -y install libXp libpng12 java libXtst libstdc++.so.5 compat-libstdc++-33 mlocate nfs-utils libnfsidmap xorg-x11-apps xauth firefox \n",
                                 "systemctl enable rpcbind && systemctl start rpcbind \n",
                                 "sed -i.bak s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config \n",
@@ -566,9 +570,9 @@
                                 "hostnamectl set-hostname --static 'sasgridmidtier'$NodeNumber'.'$DOMAIN'' && echo ''$IP'   sasgridmidtier'$NodeNumber'.'$DOMAIN' sasgridmidtier'$NodeNumber'' >> /nfs/hostsfile \n",
                                 "HOSTNAME='sasgridmidtier'$NodeNumber'.'$DOMAIN'' \n",
                                 "echo 'preserve_hostname: true' >> /etc/cloud/cloud.cfg \n",
-                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
+                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep $PARENT_STACK_NAME | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
                                 "SERVERNODE_ID=`aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-name $SERVER_ASG_ID | grep InstanceId | cut -d'\"' -f4| tail -1` \n",
-                                "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID | grep PrivateIpAddress | tail -1 | cut -d'\"' -f4` \n",
+                                "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID --query \"Reservations[*].Instances[*].PrivateIpAddress\" --output text --no-paginate` \n",
                                 "mkdir -p ",
                                 {
                                     "Ref": "GpfsMountPoint"
@@ -579,9 +583,10 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
+								"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
-                                "sleep 30 \n",
+                                "sleep 60 \n",
                                 "/usr/lpp/mmfs/bin/mmchlicense client -N $HOSTNAME --accept \n",
                                 "/usr/lpp/mmfs/bin/mmstartup \n",
                                 "/usr/lpp/mmfs/bin/mmmount all -a \n",
@@ -730,7 +735,7 @@
                                 "SERVERSGID=`aws ec2 --region $Region describe-security-groups --group-name --filters Name=group-name,Values=$SERVERSGNAME | jq .SecurityGroups[0].GroupId | cut -d'\"' -f2` \n",
                                 "COMPUTESGNAME=`aws ec2 --region $Region describe-security-groups | grep $PARENT_STACK_NAME | grep ComputeSecurityGroup- | cut -d'\"' -f4` \n",
                                 "COMPUTESGID=`aws ec2 --region $Region describe-security-groups --group-name --filters Name=group-name,Values=$COMPUTESGNAME | jq .SecurityGroups[0].GroupId | cut -d'\"' -f2` \n",
-                                "GRIDSGNAME=`aws ec2 --region $Region describe-security-groups | grep SASGridSG- | cut -d'\"' -f4` \n",
+                                "GRIDSGNAME=`aws ec2 --region $Region describe-security-groups | grep $PARENT_STACK_NAME | grep SASGridSG- | cut -d'\"' -f4` \n",
                                 "GRIDSGID=`aws ec2 --region $Region describe-security-groups --group-name --filters Name=group-name,Values=$GRIDSGNAME | jq .SecurityGroups[0].GroupId | cut -d'\"' -f2` \n",
                                 "aws ec2 --region $Region authorize-security-group-ingress --group-id $SERVERSGID --protocol -1 --source-group $GRIDSGID \n",
                                 "aws ec2 --region $Region authorize-security-group-ingress --group-id $COMPUTESGID --protocol -1 --source-group $GRIDSGID \n",
@@ -772,14 +777,10 @@
                                 "  echo \"GPFS STACK_STATUS=\"$STACK_STATUS\n",
                                 "  if [ \"$(echo \"$STACK_STATUS\" | grep \"CREATE_FAILED\")\" ]; then exit 1; fi\n",
                                 "done\n",
-                                "mkdir /nfs ",
-                                {
-                                    "Ref": "GpfsMountPoint"
-                                },
-                                " \n",
+                                "mkdir /nfs \n",
                                 "sed -i.bak s/PasswordAuthentication' 'no/PasswordAuthentication' 'yes/g /etc/ssh/sshd_config \n",
                                 "mkdir /nfs/keys && cp ~/.ssh/id_rsa ~/.ssh/id_rsa.pub /nfs/keys/ && chmod -R 777 /nfs/ \n",
-                                "yum -y install nfs-utils python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
+                                "yum -y install nc nfs-utils python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
                                 "yum -y install libXp libpng12 java libXtst libstdc++.so.5 compat-libstdc++-33 mlocate nfs-utils libnfsidmap xorg-x11-apps xauth firefox \n",
                                 "systemctl enable rpcbind && systemctl start rpcbind \n",
                                 "sed -i.bak s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config \n",
@@ -834,9 +835,9 @@
                                 "hostnamectl set-hostname --static 'sasgridmeta'$NodeNumber'.'$DOMAIN'' && echo ''$IP'   sasgridmeta'$NodeNumber'.'$DOMAIN' sasgridmeta'$NodeNumber'' >> /nfs/hostsfile \n",
                                 "HOSTNAME='sasgridmeta'$NodeNumber'.'$DOMAIN'' \n",
                                 "echo 'preserve_hostname: true' >> /etc/cloud/cloud.cfg \n",
-                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
+                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep $PARENT_STACK_NAME | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
                                 "SERVERNODE_ID=`aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-name $SERVER_ASG_ID | grep InstanceId | cut -d'\"' -f4| tail -1` \n",
-                                "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID | grep PrivateIpAddress | tail -1 | cut -d'\"' -f4` \n",
+                                "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID --query \"Reservations[*].Instances[*].PrivateIpAddress\" --output text --no-paginate` \n",
                                 "mkdir -p ",
                                 {
                                     "Ref": "GpfsMountPoint"
@@ -847,9 +848,10 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
+								"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
-                                "sleep 30 \n",
+                                "sleep 60 \n",
                                 "/usr/lpp/mmfs/bin/mmchlicense client -N $HOSTNAME --accept \n",
                                 "/usr/lpp/mmfs/bin/mmstartup \n",
                                 "/usr/lpp/mmfs/bin/mmmount all -a \n",
@@ -910,7 +912,7 @@
             "DependsOn": [],
             "CreationPolicy": {
                 "ResourceSignal": {
-                    "Timeout": "PT20M"
+                    "Timeout": "PT60M"
                 }
             }
         },
@@ -1064,9 +1066,13 @@
                                 "\n",
                                 "yum -y install http://dl.fedoraproject.org/pub/epel/7Server/x86_64/Packages/e/epel-release-7-11.noarch.rpm \n",
                                 "yum -y update \n",
+                                {
+                                    "Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"
+                                },
+                                "PARENT_STACK_NAME=`aws --region $Region cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text`\n",
                                 "mkdir /saswork /nfs \n",
                                 "yum-config-manager --enable rhui-REGION-rhel-server-optional \n",
-                                "yum -y install nfs-utils jq python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
+                                "yum -y install nc nfs-utils jq python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
                                 "yum -y install libXp libpng12 java libXtst libstdc++.so.5 compat-libstdc++-33 mlocate nfs-utils libnfsidmap xorg-x11-apps xauth firefox \n",
                                 "echo 'DEVICE /dev/nvme[0-3]n1' > /etc/mdadm.conf \n",
                                 "echo 'ARRAY /dev/md0 devices=/dev/nvme[0-3]n1' >> /etc/mdadm.conf \n",
@@ -1137,9 +1143,9 @@
                                 "hostnamectl set-hostname --static 'sasgrid'$NodeNumber'.'$DOMAIN'' && echo ''$IP'   sasgrid'$NodeNumber'.'$DOMAIN' sasgrid'$NodeNumber'' >> /nfs/hostsfile \n",
                                 "HOSTNAME='sasgrid'$NodeNumber'.'$DOMAIN'' \n",
                                 "echo 'preserve_hostname: true' >> /etc/cloud/cloud.cfg \n",
-                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
+                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep $PARENT_STACK_NAME | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
                                 "SERVERNODE_ID=`aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-name $SERVER_ASG_ID | grep InstanceId | cut -d'\"' -f4| tail -1` \n",
-                                "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID | grep PrivateIpAddress | tail -1 | cut -d'\"' -f4` \n",
+                                "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID --query \"Reservations[*].Instances[*].PrivateIpAddress\" --output text --no-paginate` \n",
                                 "mkdir -p ",
                                 {
                                     "Ref": "GpfsMountPoint"
@@ -1150,6 +1156,7 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
+								"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
