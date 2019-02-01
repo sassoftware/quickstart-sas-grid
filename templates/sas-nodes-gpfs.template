@@ -579,6 +579,7 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
+                                "until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
@@ -834,7 +835,7 @@
                                 "hostnamectl set-hostname --static 'sasgridmeta'$NodeNumber'.'$DOMAIN'' && echo ''$IP'   sasgridmeta'$NodeNumber'.'$DOMAIN' sasgridmeta'$NodeNumber'' >> /nfs/hostsfile \n",
                                 "HOSTNAME='sasgridmeta'$NodeNumber'.'$DOMAIN'' \n",
                                 "echo 'preserve_hostname: true' >> /etc/cloud/cloud.cfg \n",
-                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
+                                "SERVER_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep $PARENT_STACK_NAME | grep ServerAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
                                 "COMPUTE_ASG_ID=`aws --region $Region autoscaling describe-auto-scaling-instances | grep ComputeAutoScalingGroup | cut -d'\"' -f4|uniq` \n",
                                 "SERVERNODE_ID=`aws --region $Region autoscaling describe-auto-scaling-groups --auto-scaling-group-name $SERVER_ASG_ID | grep InstanceId | cut -d'\"' -f4| tail -1` \n",
                                 "SERVERNODE_IP_ADDR=`aws --region $Region ec2 describe-instances --instance-id $SERVERNODE_ID | grep PrivateIpAddress | tail -1 | cut -d'\"' -f4` \n",
@@ -848,6 +849,7 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
+                                "until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
@@ -1160,6 +1162,7 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
+                                "until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
