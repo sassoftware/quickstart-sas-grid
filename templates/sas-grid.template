@@ -25,7 +25,6 @@
                         "PrivateSubnet1ID",
                         "PrivateSubnet2ID",
                         "PrivateSubnet3ID",
-                        "PublicSubnet1ID",
                         "VPCCIDR"
                     ]
                 },
@@ -45,10 +44,16 @@
                         "default": "Storage Stack:"
                     },
                     "Parameters": [
-                        "StorageStack",
-                        "StorageNodeCount",
-                        "StorageEBSVolumeType",
-                        "StorageEBSVolumeSize"
+                        "StorageStack"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "GPFS EC2 Configurations:"
+                    },
+                    "Parameters": [
+                        "DiskPerNode",
+                        "ServerNodeCount"
                     ]
                 },
                 {
@@ -74,7 +79,8 @@
                     },
                     "Parameters": [
                         "NumberOfOSSNodes",
-                        "LustreOSSEBSVolumeSize"
+                        "LustreOSSEBSVolumeSize",
+                        "LustreEBSVolumeType"
                     ]
                 },
                 {
@@ -164,20 +170,20 @@
                 "QSS3KeyPrefix": {
                     "default": "Quick Start S3 key prefix"
                 },
-                "StorageEBSVolumeType": {
-                    "default": "EBS Volumes type for Storage Instances"
+                "LustreEBSVolumeType": {
+                    "default": "EBS Volumes type for Lustre Instances"
                 },
                 "LicenseAgreementTerms": {
                     "default": "License Agreement Terms"
                 },
-                "StorageNodeCount": {
+                "DiskPerNode": {
+                    "default": "NSD Configurations: Disks Per Node"
+                },
+                "ServerNodeCount": {
                     "default": "Server Node Configurations: Server Node Count"
                 },
                 "OperatorEmail": {
                     "default": "Operator Email"
-                },
-                "StorageEBSVolumeSize": {
-                    "default": "Storage Disk size for each node"
                 }
             }
         }
@@ -254,19 +260,9 @@
         "NoOfSASGridInstances": {
             "Description": "The number of SAS Grid instances that are required (2-20).",
             "Type": "Number",
-            "Default": "2",
-            "AllowedValues": [
-                "2",
-                "4",
-                "6",
-                "8",
-                "10",
-                "12",
-                "14",
-                "16",
-                "18",
-                "20"
-            ]
+            "MinValue": "2",
+            "MaxValue": "20",
+            "Default": "2"
         },
         "LustreOSSEBSVolumeSize": {
             "Description": "EBS volume size (in GiB) for Lustre OSS nodes. You can specify 100-9900 GiB. Provide the size (in GiB) for Lustre OSS data volume in multiples of 100. Volume size for each OSS node will be assigned based on the input provided here.",
@@ -278,22 +274,9 @@
         "NumberOfOSSNodes": {
             "Description": "The number of Lustre OSS node instances that are required (3-15).",
             "Type": "Number",
-            "Default": "3",
-            "AllowedValues": [
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12",
-                "13",
-                "14",
-                "15"
-            ]
+            "MinValue": "3",
+            "MaxValue": "15",
+            "Default": "3"
         },
         "PrivateSubnet1ID": {
             "Description": "Select the subnet ID of private subnet 1 located in Availability Zone 1.",
@@ -325,8 +308,8 @@
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         },
-        "StorageEBSVolumeType": {
-            "Description": "EBS volume type for storage instances",
+        "LustreEBSVolumeType": {
+            "Description": "EBS volume type for Lustre OSS nodes.",
             "Type": "String",
             "Default": "gp2",
             "AllowedValues": [
@@ -368,15 +351,29 @@
             "Description": "Review the licensing terms at http://spectrumscale-license.s3-website-us-west-2.amazonaws.com and choose Accept to indicate your acceptance.",
             "Type": "String"
         },
-        "StorageEBSVolumeSize": {
-            "Description": "Supported disk size are MIN=100 and MAX=16384(GB)",
+        "DiskPerNode": {
+            "Description": "Number of disks attached to each Server Node. Each disk size is 500GiB",
             "Type": "Number",
-            "Default": "500",
-            "MinValue": "100",
-            "MaxValue": "16384",
-            "ConstraintDescription": "Allowed Disk size are MIN=10,MAX=16384 (GB)."
+            "Default": "1",
+            "AllowedValues": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15"
+            ]
         },
-        "StorageNodeCount": {
+        "ServerNodeCount": {
             "Description": "Number of EC2 instances to launch for NSD Server on GPFS cluster (MIN=2, MAX=64).",
             "Type": "Number",
             "Default": "2",
@@ -497,103 +494,6 @@
                 "Value": "dummy"
             }
         },
-        "LambdaExecutionRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "lambda.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
-                },
-                "Path": "/",
-                "ManagedPolicyArns": [
-                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-                ],
-                "Policies": [
-                    {
-                        "PolicyName": "EC2Policy",
-                        "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:RunInstances",
-                                        "ec2:Describe*",
-                                        "ec2:TerminateInstances",
-                                        "ec2:RebootInstances",
-                                        "ec2:*NetworkInterface*"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "iam:PassRole",
-                                        "iam:ListAttachedRolePolicies",
-                                        "iam:AttachRolePolicy"
-                                    ],
-                                    "Resource": "*"
-                                }
-                            ]
-                        }
-                    }
-                ]
-            },
-            "Condition": "RunGPFSStack"
-        },
-        "DivideEBSVolumeSize": {
-            "Type": "Custom::Add",
-            "Properties": {
-                "ServiceToken": {
-                    "Fn::GetAtt": [
-                        "DivideFunction",
-                        "Arn"
-                    ]
-                },
-                "Op1": {
-                    "Ref": "StorageEBSVolumeSize"
-                },
-                "Op2": {
-                    "Fn::FindInMap": [
-                        "Parameters",
-                        "GPFS",
-                        "DiskPerNode"
-                    ]
-                }
-            },
-            "Condition": "RunGPFSStack"
-        },
-        "DivideFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-                "Handler": "index.handler",
-                "Role": {
-                    "Fn::GetAtt": [
-                        "LambdaExecutionRole",
-                        "Arn"
-                    ]
-                },
-                "Code": {
-                    "ZipFile": {
-                        "Fn::Sub": "var response = require('cfn-response');\nexports.handler = function(event, context) {\n  var result = parseInt(event.ResourceProperties.Op1) / parseInt(event.ResourceProperties.Op2);\n result = Math.round(result);\n response.send(event, context, response.SUCCESS, {Value: result});\n};\n"
-                    }
-                },
-                "Runtime": "nodejs8.10"
-            },
-            "Condition": "RunGPFSStack"
-        },
         "LustreStack": {
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
@@ -640,7 +540,7 @@
                         "Ref": "RDGWSG"
                     },
                     "LustreEBSVolumeType": {
-                        "Ref": "StorageEBSVolumeType"
+                        "Ref": "LustreEBSVolumeType"
                     },
                     "QSS3BucketName": {
                         "Ref": "QSS3BucketName"
@@ -702,23 +602,24 @@
                         ]
                     },
                     "EBSType": {
-                        "Ref": "StorageEBSVolumeType"
-                    },
-                    "DiskPerNode": {
                         "Fn::FindInMap": [
                             "Parameters",
                             "GPFS",
-                            "DiskPerNode"
+                            "EBSType"
                         ]
                     },
+                    "DiskPerNode": {
+                        "Ref": "DiskPerNode"
+                    },
                     "DiskSize": {
-                        "Fn::GetAtt": [
-                            "DivideEBSVolumeSize",
-                            "Value"
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "DiskSize"
                         ]
                     },
                     "ServerNodeCount": {
-                        "Ref": "StorageNodeCount"
+                        "Ref": "ServerNodeCount"
                     },
                     "ServerInstanceType": {
                         "Fn::FindInMap": [
@@ -757,10 +658,7 @@
                         "Ref": "OperatorEmail"
                     }
                 }
-            },
-            "DependsOn": [
-                "DivideEBSVolumeSize"
-            ]
+            }
         },
         "SASGridStack": {
             "Type": "AWS::CloudFormation::Stack",
@@ -985,7 +883,7 @@
                     }
                 }
             },
-            "Condition": "RunGPFSStack"
+           "Condition": "RunGPFSStack"
         }
     },
     "Mappings": {
@@ -994,10 +892,11 @@
                 "BlockSize": "256K",
                 "DataReplica": "2",
                 "GpfsMountPoint": "/gpfs/sasgrid",
-                "ServerInstanceType": "r4.8xlarge",
+                "EBSType": "st1",
+                "DiskSize": "500",
+                "ServerInstanceType": "t2.large",
                 "ComputeInstanceType": "t2.small",
-                "ComputeNodeCount": "1",
-                "DiskPerNode": "10"
+                "ComputeNodeCount": "1"
             }
         }
     }

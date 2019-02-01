@@ -49,10 +49,16 @@
                         "default": "Storage Stack:"
                     },
                     "Parameters": [
-                        "StorageStack",
-                        "StorageNodeCount",
-                        "StorageEBSVolumeType",
-                        "StorageEBSVolumeSize"
+                        "StorageStack"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "GPFS EC2 Configurations:"
+                    },
+                    "Parameters": [
+                        "DiskPerNode",
+                        "ServerNodeCount"
                     ]
                 },
                 {
@@ -87,8 +93,10 @@
                         "default": "Lustre EC2 configuration"
                     },
                     "Parameters": [
+                        "LustreKeyPairName",
                         "NumberOfOSSNodes",
-                        "LustreOSSEBSVolumeSize"
+                        "LustreOSSEBSVolumeSize",
+                        "LustreEBSVolumeType"
                     ]
                 },
                 {
@@ -144,6 +152,9 @@
                 "LustreOSSEBSVolumeSize": {
                     "default": "EBS volume size for Lustre OSS"
                 },
+                "LustreEBSVolumeType": {
+                    "default": "EBS volume type for Lustre instances"
+                },
                 "NumberOfOSSNodes": {
                     "default": "Number of Lustre OSS nodes"
                 },
@@ -171,12 +182,6 @@
                 "QSS3KeyPrefix": {
                     "default": "Quick Start S3 key prefix"
                 },
-                "StorageEBSVolumeType": {
-                    "default": "EBS Volumes type for Storage Instances"
-                },
-                "StorageEBSVolumeSize": {
-                    "default": "Storage Disk size for each node"
-                },
                 "RDGWInstanceType": {
                     "default": "RDGW instance type"
                 },
@@ -195,7 +200,10 @@
                 "LicenseAgreementTerms": {
                     "default": "License Agreement Terms"
                 },
-                "StorageNodeCount": {
+                "DiskPerNode": {
+                    "default": "NSD Configurations: Disks Per Node"
+                },
+                "ServerNodeCount": {
                     "default": "Server Node Configurations: Server Node Count"
                 },
                 "OperatorEmail": {
@@ -306,25 +314,17 @@
             "MaxLength": "4",
             "Default": "100"
         },
-        "StorageEBSVolumeType": {
-            "Description": "EBS volume type for storage instances",
+        "LustreEBSVolumeType": {
             "Type": "String",
+            "Description": "EBS volume type for Lustre OSS nodes.",
             "Default": "gp2",
             "AllowedValues": [
                 "gp2",
                 "io1",
+                "standard",
                 "sc1",
-                "st1",
-                "standard"
+                "st1"
             ]
-        },
-        "StorageEBSVolumeSize": {
-            "Description": "Supported disk size are MIN=100 and MAX=16384(GB)",
-            "Type": "Number",
-            "Default": "500",
-            "MinValue": "100",
-            "MaxValue": "16384",
-            "ConstraintDescription": "Allowed Disk size are MIN=10,MAX=16384 (GB)."
         },
         "NumberOfOSSNodes": {
             "Description": "The number of Lustre OSS node instances that are required (3-15).",
@@ -421,7 +421,29 @@
             "Description": "Review the licensing terms at http://spectrumscale-license.s3-website-us-west-2.amazonaws.com and choose Accept to indicate your acceptance.",
             "Type": "String"
         },
-        "StorageNodeCount": {
+        "DiskPerNode": {
+            "Description": "Number of disks attached to each Server Node. Each disk size is 500GiB",
+            "Type": "Number",
+            "Default": "1",
+            "AllowedValues": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15"
+            ]
+        },
+        "ServerNodeCount": {
             "Description": "Number of EC2 instances to launch for NSD Server on GPFS cluster (MIN=2, MAX=64).",
             "Type": "Number",
             "Default": "2",
@@ -681,6 +703,9 @@
                     "LustreOSSEBSVolumeSize": {
                         "Ref": "LustreOSSEBSVolumeSize"
                     },
+                    "LustreEBSVolumeType": {
+                        "Ref": "LustreEBSVolumeType"
+                    },
                     "SASSoftwareDepot": {
                         "Ref": "SASSoftwareDepot"
                     },
@@ -744,23 +769,20 @@
                             "Outputs.RemoteDesktopGatewaySGID"
                         ]
                     },
+                    "DiskPerNode": {
+                        "Ref": "DiskPerNode"
+                    },
                     "StorageStack": {
                         "Ref": "StorageStack"
                     },
-                    "StorageNodeCount": {
-                        "Ref": "StorageNodeCount"
+                    "ServerNodeCount": {
+                        "Ref": "ServerNodeCount"
                     },
                     "OperatorEmail": {
                         "Ref": "OperatorEmail"
                     },
                     "LicenseAgreementTerms": {
                         "Ref": "LicenseAgreementTerms"
-                    },
-                    "StorageEBSVolumeType": {
-                        "Ref": "StorageEBSVolumeType"
-                    },
-                    "StorageEBSVolumeSize": {
-                        "Ref": "StorageEBSVolumeSize"
                     }
                 }
             },
