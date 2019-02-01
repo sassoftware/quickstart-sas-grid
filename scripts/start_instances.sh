@@ -66,7 +66,7 @@ then
 elif [ "$GRID_STACK_NAME" == "GPFSSASGrid" ]
 then
     # GPFS Compute Node
-    Compute_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ComputeSecurityGroup- | cut -d'"' -f4 --output text)
+    Compute_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep "$PARENT_STACK_NAME" | grep ComputeSecurityGroup- | cut -d'"' -f4 --output text)
     Compute_ID=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Compute_SG" --query 'Reservations[*].Instances[*].InstanceId[]' --output text)
 
     aws ec2 --region "{{AWSRegion}}" start-instances --instance-ids $Compute_ID
@@ -79,7 +79,7 @@ then
     done
 
     # GPFS Server Nodes
-    Server_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ServerSecurityGroup- | cut -d'"' -f4 --output text)
+    Server_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep "$PARENT_STACK_NAME" | grep ServerSecurityGroup- | cut -d'"' -f4 --output text)
     Server_IPs=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Server_SG" --query 'Reservations[*].Instances[*].InstanceId[]' --output text)
     if [ -f /tmp/server_nodes ]; then
       rm /tmp/server_nodes

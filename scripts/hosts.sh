@@ -95,7 +95,7 @@ then
 elif [ "$GRID_STACK_NAME" == "GPFSSASGrid" ]
 then
   # Compute Node
-  Compute_ID=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ComputeSecurityGroup- | cut -d'"' -f4 --output text)
+  Compute_ID=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep "$PARENT_STACK_NAME" | grep ComputeSecurityGroup- | cut -d'"' -f4 --output text)
   Compute_IP=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Compute_ID" --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
   echo "${Compute_IP} gpfscompute1 gpfscompute1.{{DomainDNSName}}" >> $TMPHOSTSFILE
   echo "gpfscompute1 ansible_host=${Compute_IP}" >> $TMPANSIBLEHEADER
@@ -105,7 +105,7 @@ then
   echo " " >> $INVENTORYBODY
 
   # Server Nodes
-  Server_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep ServerSecurityGroup- | cut -d'"' -f4 --output text)
+  Server_SG=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-security-groups | grep "$PARENT_STACK_NAME" | grep ServerSecurityGroup- | cut -d'"' -f4 --output text)
   Server_IPs=$(aws --no-paginate ec2 --region "{{AWSRegion}}" describe-instances --filters "Name=instance.group-name,Values=$Server_SG" --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
   count=0
   declare -a array=($Server_IPs)
