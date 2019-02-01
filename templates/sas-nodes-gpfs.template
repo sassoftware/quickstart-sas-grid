@@ -583,7 +583,7 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
-								"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
+				"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 60 \n",
@@ -848,7 +848,7 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
-								"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
+				"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 60 \n",
@@ -1156,7 +1156,7 @@
                                     "Ref": "GpfsMountPoint"
                                 },
                                 " /sas \n",
-								"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
+				"until nc -z $SERVERNODE_IP_ADDR 22; do echo \"..\"; sleep 10; done \n",
                                 "ssh $SERVERNODE_IP_ADDR \"/usr/lpp/mmfs/bin/mmlscluster -Y | grep quorum | cut -d':' -f9,10 | sed 's/:/    /g'\" >> /etc/hosts \n",
                                 "ssh $SERVERNODE_IP_ADDR \"echo \"$IP $HOSTNAME\" >> /etc/hosts && /usr/lpp/mmfs/bin/mmaddnode -N \"$HOSTNAME\"\" \n",
                                 "sleep 30 \n",
