@@ -6,7 +6,8 @@
   tasks:
   - name: stop sas services
     shell: |
-      . /usr/local/config/Lev1/sas.servers stop
+      cd /usr/local/config/Lev1
+      nohup ./sas.servers stop &
 
 - hosts: sasgridnodes
   become: yes
@@ -15,4 +16,13 @@
   tasks:
   - name: stop sas services
     shell: |
-      . /sas/config/Lev1/sas.servers stop
+      cd /sas/config/Lev1
+      nohup ./sas.servers stop &
+
+  - name: kill processes for 41415
+    shell: |
+      output=$( ps aux | grep '[4]1415' | awk '{print $2}' )
+      if [ ! -z "$output" ]
+      then
+        kill -9 $output
+      fi

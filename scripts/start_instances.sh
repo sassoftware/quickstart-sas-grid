@@ -159,3 +159,4 @@ done
 
 ansible-playbook lsf_restart.yml -vv
 ansible-playbook sas_servers_start.yml -vv
+ansible-playbook sas_servers_start_studio.yml -vv

@@ -3,6 +3,7 @@
 set -e
 set -x
 
+ansible-playbook sas_servers_stop_studio.yml -vv
 ansible-playbook sas_servers_stop.yml -vv
 
 # get parent stack
