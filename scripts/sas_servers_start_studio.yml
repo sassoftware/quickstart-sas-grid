@@ -1,0 +1,10 @@
+---
+- hosts: sasgrid1
+  become: yes
+  become_user: sasinst
+
+  tasks:
+  - name: start sas studio
+    shell: |
+      cd /sas/studioconfig
+      nohup ./sasstudio.sh start &
