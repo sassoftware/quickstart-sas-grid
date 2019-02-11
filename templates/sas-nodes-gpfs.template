@@ -201,7 +201,7 @@
                 "REDHAT": "ami-d1095db7"
             },
             "ap-northeast-2": {
-                "REDHAT": "ami-d1095db7"
+                "REDHAT": "ami-6667cb08"
             },
             "ap-south-1": {
                 "REDHAT": "ami-e06c418f"
