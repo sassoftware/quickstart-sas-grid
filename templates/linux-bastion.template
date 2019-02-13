@@ -620,6 +620,24 @@
                                 "group": "ec2-user",
                                 "authentication": "S3AccessCreds"
                             },
+                            "/tmp/sas_servers_stop_studio.yml": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sas_servers_stop_studio.yml"
+                                },
+                                "mode": "000770",
+                                "owner": "ec2-user",
+                                "group": "ec2-user",
+                                "authentication": "S3AccessCreds"
+                            },
+                            "/tmp/sas_servers_start_studio.yml": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sas_servers_start_studio.yml"
+                                },
+                                "mode": "000770",
+                                "owner": "ec2-user",
+                                "group": "ec2-user",
+                                "authentication": "S3AccessCreds"
+                            },
                             "/tmp/start_instances.sh": {
                                 "source": {
                                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/start_instances.sh"
