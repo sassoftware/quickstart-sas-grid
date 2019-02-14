@@ -5,7 +5,7 @@ This Quick Start deploys and configures SAS Grid on the AWS Cloud.
 
 SAS Grid is a shared, centrally managed analytics computing environment that features workload balancing and management, high availability, and fast processing. A SAS Grid environment in the AWS Cloud provides the elasticity and agility to scale your resources as needed.
 
-This Quick Start bootstraps the infrastructure for a SAS Grid cluster by provisioning Amazon Elastic Compute Cloud (Amazon EC2) instances for SAS Grid, SAS Metadata Server, and SAS mid-tier components. It also deploys SAS Grid into this infrastructure and sets up DDN Cloud Edition for Lustre, which provides a shared directory for the grid. 
+This Quick Start bootstraps the infrastructure for a SAS Grid cluster by provisioning Amazon Elastic Compute Cloud (Amazon EC2) instances for SAS Grid, SAS Metadata Server, and SAS mid-tier components. It also deploys SAS Grid into this infrastructure and sets up DDN Cloud Edition for Lustre (or) IBM Spectrum Scale, which provides a shared directory for the grid. 
 
 The AWS CloudFormation templates included with the Quick Start automate the following:
 
