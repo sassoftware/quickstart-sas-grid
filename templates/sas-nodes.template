@@ -288,7 +288,7 @@
                 "Handle": {
                     "Ref": "WaitHandle"
                 },
-                "Timeout": "3600",
+                "Timeout": "5400",
                 "Count": {
                     "Ref": "NoOfSASGridInstances"
                 }
@@ -360,12 +360,19 @@
                                 "\n",
                                 "mkdir /sas /nfs \n",
                                 "sed -i.bak s/PasswordAuthentication' 'no/PasswordAuthentication' 'yes/g /etc/ssh/sshd_config \n",
+                                "date \n",
                                 "yum -y install http://dl.fedoraproject.org/pub/epel/7Server/x86_64/Packages/e/epel-release-7-11.noarch.rpm \n",
+                                "date \n",
                                 "yum -y update \n",
+                                "date \n",
                                 "yum-config-manager --enable rhui-REGION-rhel-server-optional \n",
+                                "date \n",
                                 "yum -y install nfs-utils jq python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
+                                "date \n",
                                 "yum -y install libXp libpng12 java libXtst libstdc++.so.5 compat-libstdc++-33 mlocate nfs-utils libnfsidmap xorg-x11-apps xauth firefox \n",
+                                "date \n",
                                 "wget -O /tmp/lustreclient_new.tar https://s3.amazonaws.com/aws-quick-start-sas-grid/lustreclient_new.tar \n",
+                                "date \n",
                                 "systemctl enable rpcbind && systemctl start rpcbind \n",
                                 "tar -xvf /tmp/lustreclient_new.tar -C /tmp/ && cd /tmp/lustreclient/ && yum -y localinstall *.rpm \n",
                                 "sed -i.bak s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config \n",
@@ -483,7 +490,7 @@
             },
             "CreationPolicy": {
                 "ResourceSignal": {
-                    "Timeout": "PT20M"
+                    "Timeout": "PT90M"
                 }
             }
         },
@@ -553,12 +560,19 @@
                                 "\n",
                                 "mkdir /sas /nfs \n",
                                 "sed -i.bak s/PasswordAuthentication' 'no/PasswordAuthentication' 'yes/g /etc/ssh/sshd_config \n",
+                                "date \n",
                                 "yum -y install http://dl.fedoraproject.org/pub/epel/7Server/x86_64/Packages/e/epel-release-7-11.noarch.rpm \n",
+                                "date \n",
                                 "yum -y update \n",
+                                "date \n",
                                 "yum-config-manager --enable rhui-REGION-rhel-server-optional \n",
+                                "date \n",
                                 "yum -y install nfs-utils jq python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
+                                "date \n",
                                 "yum -y install libXp libpng12 java libXtst libstdc++.so.5 compat-libstdc++-33 mlocate nfs-utils libnfsidmap xorg-x11-apps xauth firefox \n",
+                                "date \n",
                                 "wget -O /tmp/lustreclient_new.tar https://s3.amazonaws.com/aws-quick-start-sas-grid/lustreclient_new.tar \n",
+                                "date \n",
                                 "systemctl enable rpcbind && systemctl start rpcbind \n",
                                 "tar -xvf /tmp/lustreclient_new.tar -C /tmp/ && cd /tmp/lustreclient/ && yum -y localinstall *.rpm \n",
                                 "sed -i.bak s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config \n",
@@ -678,7 +692,7 @@
             "DependsOn": [],
             "CreationPolicy": {
                 "ResourceSignal": {
-                    "Timeout": "PT20M"
+                    "Timeout": "PT90M"
                 }
             }
         },
