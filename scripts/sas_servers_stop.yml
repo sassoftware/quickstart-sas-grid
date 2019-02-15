@@ -6,7 +6,8 @@
   tasks:
   - name: stop sas services
     shell: |
-      . /usr/local/config/Lev1/sas.servers stop
+      cd /usr/local/config/Lev1
+      nohup ./sas.servers stop &
 
 - hosts: sasgridnodes
   become: yes
@@ -15,4 +16,14 @@
   tasks:
   - name: stop sas services
     shell: |
-      . /sas/config/Lev1/sas.servers stop
+      cd /sas/config/Lev1
+      nohup ./sas.servers stop &
+
+  - name: kill processes for 41415
+    shell: |
+      kill_41415=$(netstat -tunlp | grep 41415 | awk '{print $7}' | cut -d/ -f1)
+      if [ ! -z "$kill_41415" ]
+      then
+        kill $kill_41415
+      fi
+

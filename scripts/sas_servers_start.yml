@@ -4,50 +4,57 @@
   become_user: sasinst
 
   tasks:
-  - name: stop sas services
-    shell: |
-      . /usr/local/config/Lev1/sas.servers stop
-
-- hosts: sasgridnodes
-  become: yes
-  become_user: sasinst
-
-  tasks:
-  - name: stop sas services
-    shell: |
-      . /sas/config/Lev1/sas.servers stop
-[ec2-user@ip-10-0-143-18 tmp]$ ^C
-[ec2-user@ip-10-0-143-18 tmp]$ cat sas_servers_start.yml
----
-- hosts: sasgridmeta1
-  become: yes
-  become_user: sasinst
-
-  tasks:
   - name: start sas services
     shell: |
-      rm /sas/config/Lev1/Web/gemfire/instances/ins_41415/locator41415state.dat 2> /dev/null
-      . /usr/local/config/Lev1/sas.servers start
+      cd /usr/local/config/Lev1
+      nohup ./sas.servers start &
+      sleep 30
 
 - hosts: sasgridnodes
   become: yes
   become_user: root
 
   tasks:
+  - name: kill processes
+    shell: |
+      kill_38591=$(netstat -tunlp | grep 38591 | awk '{print $7}' | cut -d/ -f1)
+      kill_38581=$(netstat -tunlp | grep 38581 | awk '{print $7}' | cut -d/ -f1)
+      kill_41415=$(netstat -tunlp | grep 41415 | awk '{print $7}' | cut -d/ -f1)
+      if [ ! -z "$kill_38591" ]
+      then
+        kill $kill_38591
+      fi
+      if [ ! -z "$kill_38581" ]
+      then
+        kill $kill_38581
+      fi
+      if [ ! -z "$kill_41415" ]
+      then
+        kill $kill_41415
+      fi
+
   - name: mount saswork
     shell: |
-      mdadm -C /dev/md0 --level=raid0 --raid-devices=4 /dev/nvme[0-3]n1
-      mkfs.xfs /dev/md0
-      mount /dev/md0 /saswork
-      chmod 777 /saswork
+      output=$(  mount | cut -f 3 -d ' ' | grep /saswork )
+      if [ -z "$output" ]
+      then
+        mdadm -C /dev/md0 --level=raid0 --raid-devices=4 /dev/nvme[0-3]n1
+        mkfs.xfs /dev/md0
+        mount /dev/md0 /saswork
+        chmod 777 /saswork
+      fi
 
-- hosts: sasgridnodes
+- hosts: sasgrid1
   become: yes
   become_user: sasinst
 
   tasks:
-  - name: start sas services
+  - name: start sas services on sasgridnodes
     shell: |
-      . /sas/config/Lev1/sas.servers start
-      /sas/studioconfig/sasstudio.sh start
+      file="/sas/config/Lev1/Web/gemfire/instances/ins_41415/locator41415state.dat"
+      if [ -f $file ] ; then
+        rm $file
+      fi
 
+      cd /sas/config/Lev1
+      nohup ./sas.servers start &

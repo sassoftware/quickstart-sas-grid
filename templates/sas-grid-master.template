@@ -25,6 +25,8 @@
                         "VPCCIDR",
                         "PrivateSubnet1CIDR",
                         "PrivateSubnet2CIDR",
+                        "PrivateSubnet3CIDR",
+                        "PrivateSubnet4CIDR",
                         "PublicSubnet1CIDR",
                         "PublicSubnet2CIDR"
                     ]
@@ -44,7 +46,35 @@
                 },
                 {
                     "Label": {
-                        "default": "SAS Grid EC2 configuration"
+                        "default": "Storage Stack:"
+                    },
+                    "Parameters": [
+                        "StorageStack",
+                        "StorageNodeCount",
+                        "StorageEBSVolumeType",
+                        "StorageEBSVolumeSize"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Personal Configuration:"
+                    },
+                    "Parameters": [
+                        "OperatorEmail",
+                        "StorageKeyPairName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "License Information:"
+                    },
+                    "Parameters": [
+                        "LicenseAgreementTerms"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "SAS Grid EC2 Configuration"
                     },
                     "Parameters": [
                         "SASGridKeyPairName",
@@ -57,10 +87,8 @@
                         "default": "Lustre EC2 configuration"
                     },
                     "Parameters": [
-                        "LustreKeyPairName",
                         "NumberOfOSSNodes",
-                        "LustreOSSEBSVolumeSize",
-                        "LustreEBSVolumeType"
+                        "LustreOSSEBSVolumeSize"
                     ]
                 },
                 {
@@ -74,6 +102,9 @@
                 }
             ],
             "ParameterLabels": {
+                "StorageStack": {
+                    "default": "Select the Storage Stack"
+                },
                 "SASSoftwareDepot": {
                     "default": "SAS Software Depot tar file in S3"
                 },
@@ -107,23 +138,26 @@
                 "SASGridKeyPairName": {
                     "default": "SAS Grid key pair name"
                 },
-                "LustreKeyPairName": {
-                    "default": "Lustre key pair name"
+                "StorageKeyPairName": {
+                    "default": "Storage KeyPair Name"
                 },
                 "LustreOSSEBSVolumeSize": {
                     "default": "EBS volume size for Lustre OSS"
-                },
-                "LustreEBSVolumeType": {
-                    "default": "EBS volume type for Lustre instances"
                 },
                 "NumberOfOSSNodes": {
                     "default": "Number of Lustre OSS nodes"
                 },
                 "PrivateSubnet1CIDR": {
-                    "default": "SAS Grid subnet CIDR"
+                    "default": "Private Subnet 1(AZ1) CIDR"
                 },
                 "PrivateSubnet2CIDR": {
-                    "default": "Lustre subnet CIDR"
+                    "default": "Private Subnet 2(AZ1) CIDR"
+                },
+                "PrivateSubnet3CIDR": {
+                    "default": "Private Subnet 3(AZ2) CIDR"
+                },
+                "PrivateSubnet4CIDR": {
+                    "default": "Private Subnet 4(AZ2) CIDR"
                 },
                 "PublicSubnet1CIDR": {
                     "default": "Public subnet 1 CIDR"
@@ -136,6 +170,12 @@
                 },
                 "QSS3KeyPrefix": {
                     "default": "Quick Start S3 key prefix"
+                },
+                "StorageEBSVolumeType": {
+                    "default": "EBS Volumes type for Storage Instances"
+                },
+                "StorageEBSVolumeSize": {
+                    "default": "Storage Disk size for each node"
                 },
                 "RDGWInstanceType": {
                     "default": "RDGW instance type"
@@ -150,7 +190,16 @@
                     "default": "Instance type for SAS Grid instances"
                 },
                 "NoOfSASGridInstances": {
-                    "default": "Required number of SAS Grid instances"
+                    "default": "Required No of SASGrid Instances"
+                },
+                "LicenseAgreementTerms": {
+                    "default": "License Agreement Terms"
+                },
+                "StorageNodeCount": {
+                    "default": "Server Node Configurations: Server Node Count"
+                },
+                "OperatorEmail": {
+                    "default": "Operator Email"
                 }
             }
         }
@@ -169,22 +218,22 @@
             "Type": "String"
         },
         "SASPlanFiles": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "Must be a folder of plan files in S3 location, e.g. mysasbucket/sasplanfiles/",
-             "Description": "S3 location of the folder with the SAS plan files. For example, if the plan file is uploaded to s3-bucket-name/plan-files, enter s3-bucket-name/plan-files.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be a folder of planfiles in S3 location, e.g. mysasbucket/sasplanfiles/",
+            "Description": "S3 location of the folder with the SAS Plan files.For e.g. If the plan file is uploaded to '<<s3-bucket-name>>/plan-files', please enter '<<s3-bucket-name>>/plan-files'",
+            "Type": "String"
         },
         "SASLicenseMeta": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "Must be a file name containing the SAS Metadata license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
-             "Description": "Name of SAS Metadata license file. You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Metadata license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Metadata License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
+            "Type": "String"
         },
         "SASLicenseApp": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "Must be a file name containing the SAS Application Server license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
-             "Description": "Name of SAS Application Server license file. You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Application Server license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_files.",
+            "Type": "String"
         },
         "AdminPassword": {
             "Description": "Password for the administrative account. Must be at least 8 characters containing letters, numbers and symbols.",
@@ -213,6 +262,14 @@
             "MinLength": "3",
             "Type": "String"
         },
+        "StorageStack": {
+            "Description": "Select Storage Stack",
+            "Type": "String",
+            "AllowedValues": [
+                "Lustre",
+                "GPFS"
+            ]
+        },
         "RDGWKeyPairName": {
             "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
             "Type": "AWS::EC2::KeyPair::KeyName"
@@ -236,9 +293,11 @@
             "MaxValue": "20",
             "Default": "2"
         },
-        "LustreKeyPairName": {
-            "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
-            "Type": "AWS::EC2::KeyPair::KeyName"
+        "StorageKeyPairName": {
+            "Description": "Name of an existing EC2 Key Pair.",
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "MinLength": "1",
+            "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
         },
         "LustreOSSEBSVolumeSize": {
             "Description": "EBS volume size (in GiB) for Lustre OSS nodes. You can specify 100-9900 GiB. Provide size (in GiB) for Lustre OSS data volume in multiples of 100. Volume size for each OSS node will be assigned based on the input provided here.",
@@ -247,17 +306,25 @@
             "MaxLength": "4",
             "Default": "100"
         },
-        "LustreEBSVolumeType": {
+        "StorageEBSVolumeType": {
+            "Description": "EBS volume type for storage instances",
             "Type": "String",
-            "Description": "EBS volume type for Lustre OSS nodes.",
             "Default": "gp2",
             "AllowedValues": [
                 "gp2",
                 "io1",
-                "standard",
                 "sc1",
-                "st1"
+                "st1",
+                "standard"
             ]
+        },
+        "StorageEBSVolumeSize": {
+            "Description": "Supported disk size are MIN=100 and MAX=16384(GB)",
+            "Type": "Number",
+            "Default": "500",
+            "MinValue": "100",
+            "MaxValue": "16384",
+            "ConstraintDescription": "Allowed Disk size are MIN=10,MAX=16384 (GB)."
         },
         "NumberOfOSSNodes": {
             "Description": "The number of Lustre OSS node instances that are required (3-15).",
@@ -270,14 +337,28 @@
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.0.0/19",
-            "Description": "CIDR block for private subnet 1 (SAS Grid subnet) located in Availability Zone 1.",
+            "Description": "CIDR block for private subnet 1 located in Availability Zone 1.",
             "Type": "String"
         },
         "PrivateSubnet2CIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.192.0/21",
-            "Description": "CIDR block for private subnet 2 (Lustre subnet) located in Availability Zone 1.",
+            "Description": "CIDR block for private subnet 2 located in Availability Zone 1.",
+            "Type": "String"
+        },
+        "PrivateSubnet3CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.32.0/19",
+            "Description": "CIDR block for private subnet 3 located in Availability Zone 2.",
+            "Type": "String"
+        },
+        "PrivateSubnet4CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.200.0/21",
+            "Description": "CIDR block for private subnet 4 located in Availability Zone 2.",
             "Type": "String"
         },
         "PublicSubnet1CIDR": {
@@ -332,6 +413,60 @@
             "Default": "10.0.0.0/16",
             "Description": "CIDR block for the VPC.",
             "Type": "String"
+        },
+        "LicenseAgreementTerms": {
+            "AllowedValues": [
+                "Accept"
+            ],
+            "Description": "Review the licensing terms at http://spectrumscale-license.s3-website-us-west-2.amazonaws.com and choose Accept to indicate your acceptance.",
+            "Type": "String"
+        },
+        "StorageNodeCount": {
+            "Description": "Number of EC2 instances to launch for NSD Server on GPFS cluster (MIN=2, MAX=64).",
+            "Type": "Number",
+            "Default": "2",
+            "AllowedValues": [
+                "2",
+                "4",
+                "6",
+                "8",
+                "10",
+                "12",
+                "14",
+                "16",
+                "18",
+                "20",
+                "22",
+                "24",
+                "26",
+                "28",
+                "30",
+                "32",
+                "34",
+                "36",
+                "38",
+                "40",
+                "42",
+                "44",
+                "46",
+                "48",
+                "50",
+                "52",
+                "54",
+                "56",
+                "58",
+                "60",
+                "62",
+                "64"
+            ],
+            "ConstraintDescription": "NSD Server node size must be less then or equal to 64."
+        },
+        "OperatorEmail": {
+            "AllowedPattern": "([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)",
+            "Description": "Email address that notifications of any scaling operations will be sent to.",
+            "MinLength": "1",
+            "Type": "String",
+            "ConstraintDescription": "Must be a valid email address."
         }
     },
     "Conditions": {
@@ -413,6 +548,12 @@
                     },
                     "PrivateSubnet1BCIDR": {
                         "Ref": "PrivateSubnet2CIDR"
+                    },
+                    "PrivateSubnet2ACIDR": {
+                        "Ref": "PrivateSubnet3CIDR"
+                    },
+                    "PrivateSubnet2BCIDR": {
+                        "Ref": "PrivateSubnet4CIDR"
                     },
                     "PublicSubnet1CIDR": {
                         "Ref": "PublicSubnet1CIDR"
@@ -534,14 +675,11 @@
                     "NoOfSASGridInstances": {
                         "Ref": "NoOfSASGridInstances"
                     },
-                    "LustreKeyPairName": {
-                        "Ref": "LustreKeyPairName"
+                    "StorageKeyPairName": {
+                        "Ref": "StorageKeyPairName"
                     },
                     "LustreOSSEBSVolumeSize": {
                         "Ref": "LustreOSSEBSVolumeSize"
-                    },
-                    "LustreEBSVolumeType": {
-                        "Ref": "LustreEBSVolumeType"
                     },
                     "SASSoftwareDepot": {
                         "Ref": "SASSoftwareDepot"
@@ -568,6 +706,12 @@
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PrivateSubnet1BID"
+                        ]
+                    },
+                    "PrivateSubnet3ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet2AID"
                         ]
                     },
                     "PublicSubnet1ID": {
@@ -599,6 +743,24 @@
                             "RDGWStack",
                             "Outputs.RemoteDesktopGatewaySGID"
                         ]
+                    },
+                    "StorageStack": {
+                        "Ref": "StorageStack"
+                    },
+                    "StorageNodeCount": {
+                        "Ref": "StorageNodeCount"
+                    },
+                    "OperatorEmail": {
+                        "Ref": "OperatorEmail"
+                    },
+                    "LicenseAgreementTerms": {
+                        "Ref": "LicenseAgreementTerms"
+                    },
+                    "StorageEBSVolumeType": {
+                        "Ref": "StorageEBSVolumeType"
+                    },
+                    "StorageEBSVolumeSize": {
+                        "Ref": "StorageEBSVolumeSize"
                     }
                 }
             },

@@ -1,5 +1,5 @@
 ---
-- hosts: sasgrid-all
+- hosts: sas-all
   gather_facts: no
   become: yes
   become_user: root
@@ -10,10 +10,12 @@
 
   - name: wait for instances
     wait_for_connection:
-      timeout: 3600
+      timeout: 120 
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: Gathering facts
     setup:
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
   - name: add all hosts
     blockinfile:
@@ -21,3 +23,4 @@
       marker: '# {mark} add all hosts'
       insertafter: 'EOF'
       block:  "{{ lookup('file', '/tmp/extra_hosts') }}"
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"

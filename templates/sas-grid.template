@@ -24,6 +24,7 @@
                         "VPCID",
                         "PrivateSubnet1ID",
                         "PrivateSubnet2ID",
+                        "PrivateSubnet3ID",
                         "PublicSubnet1ID",
                         "VPCCIDR"
                     ]
@@ -41,13 +42,39 @@
                 },
                 {
                     "Label": {
-                        "default": "Lustre EC2 configuration"
+                        "default": "Storage Stack:"
+                    },
+                    "Parameters": [
+                        "StorageStack",
+                        "StorageNodeCount",
+                        "StorageEBSVolumeType",
+                        "StorageEBSVolumeSize"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Personal Configuration:"
+                    },
+                    "Parameters": [
+                        "OperatorEmail",
+                        "StorageKeyPairName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "License Information:"
+                    },
+                    "Parameters": [
+                        "LicenseAgreementTerms"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Lustre EC2 Configuration"
                     },
                     "Parameters": [
                         "NumberOfOSSNodes",
-                        "LustreOSSEBSVolumeSize",
-                        "LustreEBSVolumeType",
-                        "LustreKeyPairName"
+                        "LustreOSSEBSVolumeSize"
                     ]
                 },
                 {
@@ -71,11 +98,8 @@
                 }
             ],
             "ParameterLabels": {
-                "AdminPassword": {
-                    "default": "Admin password"
-                },
-                "AdminIngressLocation": {
-                    "default": "Admin ingress location"
+                "StorageStack": {
+                    "default": "Select the Storage Stack"
                 },
                 "SASSoftwareDepot": {
                     "default": "SAS Software Depot tar file in S3"
@@ -107,14 +131,17 @@
                 "PublicSubnet1ID": {
                     "default": "Public subnet 1 ID"
                 },
+                "PrivateSubnet3ID": {
+                    "default": "Private Subnet 3 ID"
+                },
                 "DomainDNSName": {
                     "default": "Domain DNS name"
                 },
                 "RDGWSG": {
                     "default": "RDGW security group ID"
                 },
-                "LustreKeyPairName": {
-                    "default": "Lustre key pair name"
+                "StorageKeyPairName": {
+                    "default": "Storage KeyPair Name"
                 },
                 "LustreOSSEBSVolumeSize": {
                     "default": "EBS volume size for Lustre OSS"
@@ -137,13 +164,33 @@
                 "QSS3KeyPrefix": {
                     "default": "Quick Start S3 key prefix"
                 },
-                "LustreEBSVolumeType": {
-                    "default": "EBS volume type for Lustre instances"
+                "StorageEBSVolumeType": {
+                    "default": "EBS Volumes type for Storage Instances"
+                },
+                "LicenseAgreementTerms": {
+                    "default": "License Agreement Terms"
+                },
+                "StorageNodeCount": {
+                    "default": "Server Node Configurations: Server Node Count"
+                },
+                "OperatorEmail": {
+                    "default": "Operator Email"
+                },
+                "StorageEBSVolumeSize": {
+                    "default": "Storage Disk size for each node"
                 }
             }
         }
     },
     "Parameters": {
+        "StorageStack": {
+            "Description": "Select Storage Stack",
+            "Type": "String",
+            "AllowedValues": [
+                "Lustre",
+                "GPFS"
+            ]
+        },
         "SASSoftwareDepot": {
             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
             "ConstraintDescription": "Must be a tar file in a valid S3 location, e.g. mysasbucket/sasorders",
@@ -157,25 +204,25 @@
             "Type": "String"
         },
         "SASPlanFiles": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "must be a folder of planfiles in S3 location, e.g. mysasbucket/sasplanfiles/.",
-             "Description": "S3 location of the folder with the SAS plan files.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be a folder of planfiles in S3 location, e.g. mysasbucket/sasplanfiles/",
+            "Description": "S3 location of the folder with the SAS Plan files",
+            "Type": "String"
         },
         "SASLicenseMeta": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "Must be the file name of the SAS Metadata Server license, such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt.",
-             "Description": "Name of SAS Metadata license file.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Metadata license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Metadata License file",
+            "Type": "String"
         },
         "SASLicenseApp": {
-             "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
-             "ConstraintDescription": "Must be the file name of the SAS Application Server license, such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt.",
-             "Description": "Name of SAS Application Server License file.",
-             "Type": "String"
+            "AllowedPattern": "^([-a-zA-Z0-9@:%_\\+.~#?&//=]*)$",
+            "ConstraintDescription": "must be file name containing the SAS Application Server license such as SAS94_9C1TDT_70243248_LINUX_X86-64.txt",
+            "Description": "Name of SAS Application Server License file",
+            "Type": "String"
         },
-        "LustreKeyPairName": {
-            "Description": "Name of an existing EC2 key pair.",
+        "StorageKeyPairName": {
+            "Description": "Name of an existing EC2 Key Pair.",
             "Type": "AWS::EC2::KeyPair::KeyName",
             "MinLength": "1",
             "ConstraintDescription": "Must be the name of an existing EC2 key pair."
@@ -207,9 +254,19 @@
         "NoOfSASGridInstances": {
             "Description": "The number of SAS Grid instances that are required (2-20).",
             "Type": "Number",
-            "MinValue": "2",
-            "MaxValue": "20",
-            "Default": "2"
+            "Default": "2",
+            "AllowedValues": [
+                "2",
+                "4",
+                "6",
+                "8",
+                "10",
+                "12",
+                "14",
+                "16",
+                "18",
+                "20"
+            ]
         },
         "LustreOSSEBSVolumeSize": {
             "Description": "EBS volume size (in GiB) for Lustre OSS nodes. You can specify 100-9900 GiB. Provide the size (in GiB) for Lustre OSS data volume in multiples of 100. Volume size for each OSS node will be assigned based on the input provided here.",
@@ -221,9 +278,22 @@
         "NumberOfOSSNodes": {
             "Description": "The number of Lustre OSS node instances that are required (3-15).",
             "Type": "Number",
-            "MinValue": "3",
-            "MaxValue": "15",
-            "Default": "3"
+            "Default": "3",
+            "AllowedValues": [
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15"
+            ]
         },
         "PrivateSubnet1ID": {
             "Description": "Select the subnet ID of private subnet 1 located in Availability Zone 1.",
@@ -231,6 +301,10 @@
         },
         "PrivateSubnet2ID": {
             "Description": "Select the subnet ID of private subnet 2 located in Availability Zone 1.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "PrivateSubnet3ID": {
+            "Description": "Select the Subnet ID of a private subnet 3 located in Availability Zone 2.",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PublicSubnet1ID": {
@@ -251,8 +325,8 @@
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         },
-        "LustreEBSVolumeType": {
-            "Description": "EBS volume type for Lustre OSS nodes.",
+        "StorageEBSVolumeType": {
+            "Description": "EBS volume type for storage instances",
             "Type": "String",
             "Default": "gp2",
             "AllowedValues": [
@@ -286,9 +360,87 @@
             "MinLength": "8",
             "MaxLength": "32",
             "NoEcho": "true"
+        },
+        "LicenseAgreementTerms": {
+            "AllowedValues": [
+                "Accept"
+            ],
+            "Description": "Review the licensing terms at http://spectrumscale-license.s3-website-us-west-2.amazonaws.com and choose Accept to indicate your acceptance.",
+            "Type": "String"
+        },
+        "StorageEBSVolumeSize": {
+            "Description": "Supported disk size are MIN=100 and MAX=16384(GB)",
+            "Type": "Number",
+            "Default": "500",
+            "MinValue": "100",
+            "MaxValue": "16384",
+            "ConstraintDescription": "Allowed Disk size are MIN=10,MAX=16384 (GB)."
+        },
+        "StorageNodeCount": {
+            "Description": "Number of EC2 instances to launch for NSD Server on GPFS cluster (MIN=2, MAX=64).",
+            "Type": "Number",
+            "Default": "2",
+            "AllowedValues": [
+                "2",
+                "4",
+                "6",
+                "8",
+                "10",
+                "12",
+                "14",
+                "16",
+                "18",
+                "20",
+                "22",
+                "24",
+                "26",
+                "28",
+                "30",
+                "32",
+                "34",
+                "36",
+                "38",
+                "40",
+                "42",
+                "44",
+                "46",
+                "48",
+                "50",
+                "52",
+                "54",
+                "56",
+                "58",
+                "60",
+                "62",
+                "64"
+            ],
+            "ConstraintDescription": "NSD Server node size must be less then or equal to 64."
+        },
+        "OperatorEmail": {
+            "AllowedPattern": "([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)",
+            "Description": "Email address that notifications of any scaling operations will be sent to.",
+            "MinLength": "1",
+            "Type": "String",
+            "ConstraintDescription": "Must be a valid email address."
         }
     },
     "Conditions": {
+        "RunLustreStack": {
+            "Fn::Equals": [
+                {
+                    "Ref": "StorageStack"
+                },
+                "Lustre"
+            ]
+        },
+        "RunGPFSStack": {
+            "Fn::Equals": [
+                {
+                    "Ref": "StorageStack"
+                },
+                "GPFS"
+            ]
+        },
         "GovCloudCondition": {
             "Fn::Equals": [
                 {
@@ -298,7 +450,7 @@
             ]
         }
     },
-        "Rules": {
+    "Rules": {
         "LustreSupportedRegionRule": {
             "Assertions": [
                 {
@@ -335,11 +487,112 @@
         "AnsiblePublicKey": {
             "Type": "AWS::SSM::Parameter",
             "Properties": {
-              "Name": { "Fn::Sub":  "sas-grid-ansiblekey-${AWS::StackName}" },
-              "Description": { "Fn::Sub": "sas-grid-ansiblekey-${AWS::StackName}" },
-              "Type": "String",
-              "Value": "dummy"
+                "Name": {
+                    "Fn::Sub": "sas-grid-ansiblekey-${AWS::StackName}"
+                },
+                "Description": {
+                    "Fn::Sub": "sas-grid-ansiblekey-${AWS::StackName}"
+                },
+                "Type": "String",
+                "Value": "dummy"
             }
+        },
+        "LambdaExecutionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                ],
+                "Policies": [
+                    {
+                        "PolicyName": "EC2Policy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ec2:RunInstances",
+                                        "ec2:Describe*",
+                                        "ec2:TerminateInstances",
+                                        "ec2:RebootInstances",
+                                        "ec2:*NetworkInterface*"
+                                    ],
+                                    "Resource": "*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "iam:PassRole",
+                                        "iam:ListAttachedRolePolicies",
+                                        "iam:AttachRolePolicy"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "Condition": "RunGPFSStack"
+        },
+        "DivideEBSVolumeSize": {
+            "Type": "Custom::Add",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "DivideFunction",
+                        "Arn"
+                    ]
+                },
+                "Op1": {
+                    "Ref": "StorageEBSVolumeSize"
+                },
+                "Op2": {
+                    "Fn::FindInMap": [
+                        "Parameters",
+                        "GPFS",
+                        "DiskPerNode"
+                    ]
+                }
+            },
+            "Condition": "RunGPFSStack"
+        },
+        "DivideFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Handler": "index.handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaExecutionRole",
+                        "Arn"
+                    ]
+                },
+                "Code": {
+                    "ZipFile": {
+                        "Fn::Sub": "var response = require('cfn-response');\nexports.handler = function(event, context) {\n  var result = parseInt(event.ResourceProperties.Op1) / parseInt(event.ResourceProperties.Op2);\n result = Math.round(result);\n response.send(event, context, response.SUCCESS, {Value: result});\n};\n"
+                    }
+                },
+                "Runtime": "nodejs8.10"
+            },
+            "Condition": "RunGPFSStack"
         },
         "LustreStack": {
             "Type": "AWS::CloudFormation::Stack",
@@ -375,7 +628,7 @@
                         "Ref": "LustreOSSEBSVolumeSize"
                     },
                     "LustreKeyPairName": {
-                        "Ref": "LustreKeyPairName"
+                        "Ref": "StorageKeyPairName"
                     },
                     "VPCID": {
                         "Ref": "VPCID"
@@ -387,19 +640,127 @@
                         "Ref": "RDGWSG"
                     },
                     "LustreEBSVolumeType": {
-                        "Ref": "LustreEBSVolumeType"
+                        "Ref": "StorageEBSVolumeType"
                     },
                     "QSS3BucketName": {
-                       "Ref": "QSS3BucketName"
+                        "Ref": "QSS3BucketName"
                     },
                     "QSS3KeyPrefix": {
-                       "Ref": "QSS3KeyPrefix"
+                        "Ref": "QSS3KeyPrefix"
                     },
                     "SASSoftwareDepot": {
-                       "Ref": "SASSoftwareDepot"
+                        "Ref": "SASSoftwareDepot"
                     }
                 }
-            }
+            },
+            "Condition": "RunLustreStack"
+        },
+        "GPFSStack": {
+            "Condition": "RunGPFSStack",
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Sub": [
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-ibm-spectrum-scale/templates/ibm-spectrum-scale.template",
+                        {
+                            "QSS3Region": {
+                                "Fn::If": [
+                                    "GovCloudCondition",
+                                    "s3-us-gov-west-1",
+                                    "s3"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "Parameters": {
+                    "LicenseAgreementTerms": {
+                        "Ref": "LicenseAgreementTerms"
+                    },
+                    "BastionSecurityGroupID": {
+                        "Ref": "RDGWSG"
+                    },
+                    "BlockSize": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "BlockSize"
+                        ]
+                    },
+                    "DataReplica": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "DataReplica"
+                        ]
+                    },
+                    "GpfsMountPoint": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "GpfsMountPoint"
+                        ]
+                    },
+                    "EBSType": {
+                        "Ref": "StorageEBSVolumeType"
+                    },
+                    "DiskPerNode": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "DiskPerNode"
+                        ]
+                    },
+                    "DiskSize": {
+                        "Fn::GetAtt": [
+                            "DivideEBSVolumeSize",
+                            "Value"
+                        ]
+                    },
+                    "ServerNodeCount": {
+                        "Ref": "StorageNodeCount"
+                    },
+                    "ServerInstanceType": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "ServerInstanceType"
+                        ]
+                    },
+                    "ComputeNodeCount": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "ComputeNodeCount"
+                        ]
+                    },
+                    "ComputeInstanceType": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "ComputeInstanceType"
+                        ]
+                    },
+                    "VpcId": {
+                        "Ref": "VPCID"
+                    },
+                    "PrivateSubnet1ID": {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    "PrivateSubnet2ID": {
+                        "Ref": "PrivateSubnet3ID"
+                    },
+                    "KeyPairName": {
+                        "Ref": "StorageKeyPairName"
+                    },
+                    "OperatorEmail": {
+                        "Ref": "OperatorEmail"
+                    }
+                }
+            },
+            "DependsOn": [
+                "DivideEBSVolumeSize"
+            ]
         },
         "SASGridStack": {
             "Type": "AWS::CloudFormation::Stack",
@@ -483,14 +844,15 @@
             },
             "DependsOn": [
                 "LustreStack"
-            ]
+            ],
+            "Condition": "RunLustreStack"
         },
         "LinuxBastionStack": {
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
                     "Fn::Sub": [
-                       "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template.yaml",
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/linux-bastion.template",
                         {
                             "QSS3Region": {
                                 "Fn::If": [
@@ -522,7 +884,7 @@
                         "Ref": "SASGridKeyPairName"
                     },
                     "LustreKeyPairName": {
-                        "Ref": "LustreKeyPairName"
+                        "Ref": "StorageKeyPairName"
                     },
                     "KeyPairName": {
                         "Ref": "SASGridKeyPairName"
@@ -546,15 +908,96 @@
                         "Ref": "RDGWSG"
                     },
                     "QSS3BucketName": {
-                       "Ref": "QSS3BucketName"
+                        "Ref": "QSS3BucketName"
                     },
                     "QSS3KeyPrefix": {
-                       "Ref": "QSS3KeyPrefix"
+                        "Ref": "QSS3KeyPrefix"
                     },
                     "AdminPassword": {
-                       "Ref": "AdminPassword"
+                        "Ref": "AdminPassword"
+                    },
+                    "StorageStack": {
+                        "Ref": "StorageStack"
                     }
                 }
+            }
+        },
+        "GPFSSASGrid": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Sub": [
+                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}templates/sas-nodes-gpfs.template",
+                        {
+                            "QSS3Region": {
+                                "Fn::If": [
+                                    "GovCloudCondition",
+                                    "s3-us-gov-west-1",
+                                    "s3"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "Parameters": {
+                    "SASSoftwareDepot": {
+                        "Ref": "SASSoftwareDepot"
+                    },
+                    "SASSoftwareDepotName": {
+                        "Ref": "SASSoftwareDepotName"
+                    },
+                    "SASPlanFiles": {
+                        "Ref": "SASPlanFiles"
+                    },
+                    "SASLicenseMeta": {
+                        "Ref": "SASLicenseMeta"
+                    },
+                    "SASLicenseApp": {
+                        "Ref": "SASLicenseApp"
+                    },
+                    "SASGridInstanceType": {
+                        "Ref": "SASGridInstanceType"
+                    },
+                    "NoOfSASGridInstances": {
+                        "Ref": "NoOfSASGridInstances"
+                    },
+                    "SASGridKeyPairName": {
+                        "Ref": "SASGridKeyPairName"
+                    },
+                    "PrivateSubnet1ID": {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    "VPCID": {
+                        "Ref": "VPCID"
+                    },
+                    "VPCCIDR": {
+                        "Ref": "VPCCIDR"
+                    },
+                    "DomainDNSName": {
+                        "Ref": "DomainDNSName"
+                    },
+                    "GpfsMountPoint": {
+                        "Fn::FindInMap": [
+                            "Parameters",
+                            "GPFS",
+                            "GpfsMountPoint"
+                        ]
+                    }
+                }
+            },
+            "Condition": "RunGPFSStack"
+        }
+    },
+    "Mappings": {
+        "Parameters": {
+            "GPFS": {
+                "BlockSize": "256K",
+                "DataReplica": "2",
+                "GpfsMountPoint": "/gpfs/sasgrid",
+                "ServerInstanceType": "r4.8xlarge",
+                "ComputeInstanceType": "t2.small",
+                "ComputeNodeCount": "1",
+                "DiskPerNode": "10"
             }
         }
     }
