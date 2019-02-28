@@ -4,12 +4,29 @@ global:
   qsname: quickstart-sas-grid
   regions:
     - us-east-1
-    - us-west-2
+    - us-east-2
+    - ap-south-1
     - eu-west-1
-    - ap-southeast-2
+    - us-west-1
+    - us-west-2
+    - ca-central-1
+    - eu-central-1
   reporting: true
 
 tests:
-  quickstart-sas-gridt1:
-    parameter_input: sasgrid-quickstart-input-withvpc.json
+  sas-grid-lustre:
+    parameter_input: sasgrid-quickstart-input-lustre.json
     template_file: sas-grid-master.template
+    regions:
+      - us-east-1
+      - us-east-2
+      - ap-south-1
+      - eu-west-1
+  sas-grid-gpfs:
+    parameter_input: sasgrid-quickstart-input-gpfs.json
+    template_file: sas-grid-master.template
+    regions:
+      - us-west-1
+      - us-west-2
+      - ca-central-1
+      - eu-central-1

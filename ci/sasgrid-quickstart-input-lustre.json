@@ -1,0 +1,78 @@
+[
+    {
+        "ParameterKey": "RDGWKeyPairName",
+        "ParameterValue": "$[alfred_getkeypair]"
+    },
+    {
+        "ParameterKey": "SASGridKeyPairName",
+        "ParameterValue": "$[alfred_getkeypair]"
+    },
+    {
+        "ParameterKey": "StorageKeyPairName",
+        "ParameterValue": "$[alfred_getkeypair]"
+    },
+    {
+        "ParameterKey": "AdminUser",
+        "ParameterValue": "testadmin"
+    },
+    {
+        "ParameterKey": "AdminPassword",
+        "ParameterValue": "$[taskcat_genpass_8A]"
+    },
+    {
+        "ParameterKey": "DomainDNSName",
+        "ParameterValue": "example.com"
+    },
+    {
+        "ParameterKey": "RDGWCIDR",
+        "ParameterValue": "10.0.0.0/16"
+    },
+    {
+        "ParameterKey": "LustreOSSEBSVolumeSize",
+        "ParameterValue": "100"
+    },
+    {
+        "ParameterKey": "LicenseAgreementTerms",
+        "ParameterValue": "Accept"
+    },
+    {
+        "ParameterKey": "OperatorEmail",
+        "ParameterValue": "quickstart@example.com"
+    },
+    {
+        "ParameterKey": "StorageStack",
+        "ParameterValue": "Lustre"
+    },
+    {
+        "ParameterKey": "NumberOfOSSNodes",
+        "ParameterValue": "3"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "$[taskcat_genaz_2]"
+    },
+    {
+        "ParameterKey": "QSS3BucketName",
+        "ParameterValue": "$[taskcat_autobucket]"
+    },
+    {
+        "ParameterKey": "SASSoftwareDepot",
+        "ParameterValue": "override_this"
+    },
+    {
+        "ParameterKey": "SASSoftwareDepotName",
+        "ParameterValue": "override_this"
+    },
+    {
+        "ParameterKey": "SASPlanFiles",
+        "ParameterValue": "override_this"
+    },
+    {
+        "ParameterKey": "SASLicenseMeta",
+        "ParameterValue": "override_this"
+    },
+    {
+        "ParameterKey": "SASLicenseApp",
+        "ParameterValue": "override_this"
+    }
+]
