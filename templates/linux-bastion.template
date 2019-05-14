@@ -508,27 +508,6 @@
                                 "owner": "ec2-user",
                                 "group": "ec2-user"
                             },
-                            "/tmp/lsf_install.yml": {
-                                "source": {
-                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/lsf_install.yml"
-                                },
-                                "mode": "000660",
-                                "owner": "ec2-user",
-                                "group": "ec2-user"
-                            },
-                            "/tmp/lsf_install.config": {
-                                "source": {
-                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/lsf_install.config"
-                                },
-                                "mode": "000660",
-                                "owner": "ec2-user",
-                                "group": "ec2-user",
-                                "context": {
-                                    "DomainDNSName": {
-                                        "Ref": "DomainDNSName"
-                                    }
-                                }
-                            },
                             "/tmp/copy_files.yml": {
                                 "source": {
                                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/copy_files.yml"
@@ -545,9 +524,25 @@
                                 "owner": "ec2-user",
                                 "group": "ec2-user"
                             },
+                            "/tmp/sas_install_midtier.yml": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/sas_install_midtier.yml"
+                                },
+                                "mode": "000660",
+                                "owner": "ec2-user",
+                                "group": "ec2-user"
+                            },
                             "/tmp/sas_install_metadata.yml": {
                                 "source": {
                                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/sas_install_metadata.yml"
+                                },
+                                "mode": "000660",
+                                "owner": "ec2-user",
+                                "group": "ec2-user"
+                            },
+                            "/tmp/workload_restart.yml": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}playbooks/workload_restart.yml"
                                 },
                                 "mode": "000660",
                                 "owner": "ec2-user",
@@ -592,15 +587,6 @@
                                         "Ref": "NumberOfOSSNodes"
                                     }
                                 }
-                            },
-                            "/tmp/lsf_restart.yml": {
-                                "source": {
-                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/lsf_restart.yml"
-                                },
-                                "mode": "000770",
-                                "owner": "ec2-user",
-                                "group": "ec2-user",
-                                "authentication": "S3AccessCreds"
                             },
                             "/tmp/sas_servers_start.yml": {
                                 "source": {

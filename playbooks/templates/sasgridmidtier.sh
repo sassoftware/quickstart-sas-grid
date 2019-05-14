@@ -22,14 +22,13 @@ if ! grep -q "ulimit" /home/sasinst/.bash_profile; then
 fi
 
 cd /usr/local
-rm -Rf SASHome/* config/* config2/* metadata/* /home/sasinst/.SASApp*
-pkill -U sasinst
+rm -Rf config2/* 
 exit
 EOF
 
 sudo -u sasinst bash << EOF
 cd /sas/$1                        
-./setup.sh -deploy -quiet -responsefile /sas/quickstart/playbooks/templates/metadata_install.txt
+./setup.sh -deploy -quiet -responsefile /sas/quickstart/playbooks/templates/midtier_install.txt
 exit
 EOF
 
@@ -40,7 +39,13 @@ EOF
 
 sudo -u sasinst bash << EOF
 cd /sas/$1                        
-./setup.sh -deploy -quiet -responsefile /sas/quickstart/playbooks/templates/metadata_config.txt
+./setup.sh -deploy -quiet -responsefile /sas/quickstart/playbooks/templates/midtier_config.txt -skipadmincheck
 exit
 EOF
 
+#sudo -u root bash << EOF
+#echo '-WORK /saswork' >> /sas/SASHome/SASFoundation/9.4/nls/en/sasv9.cfg
+#/sas/SASHome/SASFoundation/9.4/utilities/bin/setuid.sh
+#. /sas/studioconfig/sasstudio.sh start
+#exit
+#EOF

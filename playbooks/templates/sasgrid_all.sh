@@ -16,10 +16,6 @@ if ! grep -q "SASFoundation" /etc/profile; then
     echo 'export PATH=$PATH:/sas/SASHome/SASFoundation/9.4' >> /etc/profile
 fi
 
-if ! grep -q "profile.lsf" /etc/profile; then  
-    echo ". /sas/lsf/conf/profile.lsf" >> /etc/profile
-fi
-
 if ! grep -q "ulimit" /home/sasinst/.bash_profile; then
     echo "ulimit -n 20480" >> /home/sasinst/.bash_profile
     echo "ulimit -u 20480" >> /home/sasinst/.bash_profile
@@ -27,3 +23,9 @@ fi
 
 exit
 EOF
+
+#sudo -u sasinst bash << EOF
+#cd /sas/config/Lev1/Grid
+#./sgmg.sh start
+#exit
+#EOF

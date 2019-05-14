@@ -1,0 +1,10 @@
+---
+- hosts: sasgridnodes
+  become: yes
+  become_user: root
+
+  tasks:
+  - name: run hostsetup
+    shell: ./sgmg.sh start
+    args:
+      chdir: /sas/config/Lev1/Grid

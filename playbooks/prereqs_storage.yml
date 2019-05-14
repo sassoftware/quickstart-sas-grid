@@ -26,14 +26,6 @@
       group: sas
     when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
 
-  - name: Ensure user "lsfadmin" exists, set password
-    user:
-      name: lsfadmin
-      uid: 502
-      password: "{{ AdminPassword | password_hash('sha512') }}"
-      group: sas
-    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
-
   - name: Ensure user "sas" exists, set password
     user:
       name: sas
@@ -86,6 +78,22 @@
     user:
       name: webanon
       uid: 509
+      password: "{{ AdminPassword | password_hash('sha512') }}"
+      group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
+
+  - name: Ensure user "dbmsowner" exists, set password
+    user:
+      name: dbmsowner
+      uid: 510
+      password: "{{ AdminPassword | password_hash('sha512') }}"
+      group: sas
+    when: "'gpfs-all' in group_names or 'lustre-all' in group_names"
+
+  - name: Ensure user "sasevdb" exists, set password
+    user:
+      name: sasevdb
+      uid: 511
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
     when: "'gpfs-all' in group_names or 'lustre-all' in group_names"

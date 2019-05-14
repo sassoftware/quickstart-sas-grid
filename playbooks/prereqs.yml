@@ -24,13 +24,6 @@
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
 
-  - name: Ensure user "lsfadmin" exists, set password
-    user:
-      name: lsfadmin
-      uid: 502
-      password: "{{ AdminPassword | password_hash('sha512') }}"
-      group: sas
-
   - name: Ensure user "sas" exists, set password
     user:
       name: sas
@@ -80,6 +73,20 @@
       password: "{{ AdminPassword | password_hash('sha512') }}"
       group: sas
 
+  - name: Ensure user "dbmsowner" exists, set password
+    user:
+      name: dbmsowner
+      uid: 510
+      password: "{{ AdminPassword | password_hash('sha512') }}"
+      group: sas
+
+  - name: Ensure user "sasevdb" exists, set password
+    user:
+      name: sasevdb
+      uid: 511
+      password: "{{ AdminPassword | password_hash('sha512') }}"
+      group: sas
+
   #
   # set ulimits on all hosts
   #
@@ -111,22 +118,6 @@
       group: sas
       mode: 0777
 
-  - name: create directory gms_install and set permssions
-    file:
-      path: /sas/gms_install
-      state: directory
-      owner: lsfadmin
-      group: sas
-      mode: 0755
-
-  - name: create directory pm_install and set permssions
-    file:
-      path: /sas/pm_install
-      state: directory
-      owner: lsfadmin
-      group: sas
-      mode: 0755
-
   - name: create directory grid and set permssions
     file:
       path: /sas/grid
@@ -142,3 +133,74 @@
       owner: sasinst
       group: sas
       mode: 0777
+
+  - name: create directory SASHome and set permssions
+    file:
+      path: /sas/SASHome
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755
+
+  - name: create directory config and set permssions
+    file:
+      path: /sas/config
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755
+
+  - name: create directory metadata and set permssions
+    file:
+      path: /sas/metadata
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755
+
+- hosts: sasgridmeta1
+  become: yes
+  become_user: root
+  vars_files:
+    -  /tmp/quickstart/playbooks/vars.yml
+
+  tasks:
+  - name: create directory SASHome and set permssions
+    file:
+      path: /usr/local/SASHome
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755
+
+  - name: create directory config and set permssions
+    file:
+      path: /usr/local/config
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755
+
+  - name: create directory config2 and set permssions
+    file:
+      path: /usr/local/config2
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755
+
+  - name: create directory metadata and set permssions
+    file:
+      path: /usr/local/metadata
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755
+
+  - name: create directory vfabric and set permssions
+    file:
+      path: /etc/opt/vmware/vfabric
+      state: directory
+      owner: sasinst
+      group: sas
+      mode: 0755

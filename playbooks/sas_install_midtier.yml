@@ -14,11 +14,12 @@
       owner: sasinst
       group: sas
     with_items:
-      - metadata_install.txt
-      - metadata_config.txt
+      - midtier_install.txt
+      - midtier_config.txt
 
-  - name: Change permissions on script
-    shell: chmod 755 /sas/quickstart/playbooks/templates/sasgridmeta.sh
+  - name: Change permissions on script 
+    shell: |
+      chmod 755 /sas/quickstart/playbooks/templates/sasgridmidtier.sh
 
 - hosts: sasgridmeta1
   become: yes
@@ -27,5 +28,5 @@
     -  /tmp/quickstart/playbooks/vars.yml
 
   tasks:
-  - name: Start SAS on SAS Meta Server
-    command: sh /sas/quickstart/playbooks/templates/sasgridmeta.sh {{SASSoftwareDepotName}} &> /tmp/sasgridmeta.log
+  - name: Start SAS on SAS Midtier Server
+    command: sh /sas/quickstart/playbooks/templates/sasgridmidtier.sh {{SASSoftwareDepotName}} &> /tmp/sasgridmidtier.log

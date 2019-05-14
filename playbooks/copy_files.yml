@@ -16,8 +16,6 @@
       time aws s3 cp s3://{{SASPlanFiles}} {{SASSoftwareDepotName}}/plan_files --recursive
       chown -R sasinst:sas {{SASSoftwareDepotName}}
       chmod -R 755 {{SASSoftwareDepotName}}
-      cp {{SASSoftwareDepotName}}/third_party/Platform_Process_Manager/10_1/Linux_for_x64/*.tar /sas/pm_install/
-      cp {{SASSoftwareDepotName}}/third_party/Platform_Grid_Management_Service/8_01D/Linux_for_x64/gms*.tar.Z /sas/gms_install/
 
   - copy:
       src: /tmp/quickstart
