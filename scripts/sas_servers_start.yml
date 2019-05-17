@@ -44,7 +44,7 @@
         chmod 777 /saswork
       fi
 
-- hosts: sasgrid1
+- hosts: sasgridnodes
   become: yes
   become_user: sasinst
 
