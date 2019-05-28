@@ -271,9 +271,7 @@
         "InfraSizeMap": {
             "InstanceTypes": {
                 "SASGridMetaInstanceType": "r4.2xlarge",
-                "SASGridMidTierInstanceType": "r4.2xlarge",
-                "NoOfSASGridMetadataInstances": "1",
-                "NoOfSASGridMidtierInstances": "1"
+                "NoOfSASGridMetadataInstances": "1"
             }
         }
     },
@@ -291,207 +289,6 @@
                 "Timeout": "5400",
                 "Count": {
                     "Ref": "NoOfSASGridInstances"
-                }
-            }
-        },
-        "SASGridMidTier": {
-            "Type": "AWS::EC2::Instance",
-            "Properties": {
-                "InstanceType": {
-                    "Fn::FindInMap": [
-                        "InfraSizeMap",
-                        "InstanceTypes",
-                        "SASGridMidTierInstanceType"
-                    ]
-                },
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "AWSAMIRegionMap",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "REDHAT"
-                    ]
-                },
-                "KeyName": {
-                    "Ref": "SASGridKeyPairName"
-                },
-                "SubnetId": {
-                    "Ref": "PrivateSubnet1ID"
-                },
-                "IamInstanceProfile": {
-                    "Ref": "DynamoDBInstanceProfileName"
-                },
-                "SecurityGroupIds": [
-                    {
-                        "Ref": "SASGridSG"
-                    }
-                ],
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "SASGrid MidTier"
-                    },
-                    {
-                        "Key": "Created By",
-                        "Value": "CoreCompete-AWS_Quick_Start"
-                    }
-                ],
-                "BlockDeviceMappings": [
-                    {
-                        "DeviceName": "/dev/sda1",
-                        "Ebs": {
-                            "VolumeType": "gp2",
-                            "VolumeSize": "50"
-                        }
-                    }
-                ],
-                "UserData": {
-                    "Fn::Base64": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                "#!/bin/bash \n",
-                                "set -x\n",
-                                "\n",
-                                "trap read debug\n",
-                                "\n",
-                                "exec 1>/tmp/bootstrap.log 2>&1\n",
-                                "\n",
-                                "mkdir /sas /nfs \n",
-                                "sed -i.bak s/PasswordAuthentication' 'no/PasswordAuthentication' 'yes/g /etc/ssh/sshd_config \n",
-                                "date \n",
-                                "yum -y install http://dl.fedoraproject.org/pub/epel/7Server/x86_64/Packages/e/epel-release-7-11.noarch.rpm \n",
-                                "date \n",
-                                "yum -y update \n",
-                                "date \n",
-                                "yum-config-manager --enable rhui-REGION-rhel-server-optional \n",
-                                "date \n",
-                                "yum -y install nfs-utils jq python-pip vim mdadm wget ed xorg-x11-apps.x86_64 xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 libXrender \n",
-                                "date \n",
-                                "yum -y install libXp libpng12 java libXtst libstdc++.so.5 compat-libstdc++-33 mlocate nfs-utils libnfsidmap xorg-x11-apps xauth firefox \n",
-                                "date \n",
-                                "wget -O /tmp/lustreclient_new.tar https://s3.amazonaws.com/aws-quick-start-sas-grid/lustreclient_new.tar \n",
-                                "date \n",
-                                "systemctl enable rpcbind && systemctl start rpcbind \n",
-                                "tar -xvf /tmp/lustreclient_new.tar -C /tmp/ && cd /tmp/lustreclient/ && yum -y localinstall *.rpm \n",
-                                "sed -i.bak s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config \n",
-                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 502 -g 1003 lsfadmin && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
-                                "useradd -u 505 -g 1003 sassrv && useradd -u 506 -g 1003 sastrust && useradd -u 507 -g 1003 sasadm && usermod -a -G sas sasinst && \n",
-                                "useradd -u 508 -g 1003 sasevs && useradd -u 509 -g 1003 webanon && useradd -u 510 -g 1003 dbmsowner && useradd -u 511 -g 1003 sasevdb \n",
-                                "yum -y install unzip epel-release xorg-x11-apps \n",
-                                "pip install pystache argparse python-daemon requests \n",
-                                "cd /opt && curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz \n",
-                                "tar -xvpf aws-cfn-bootstrap-latest.tar.gz \n",
-                                "cd aws-cfn-bootstrap-1.4/ && python setup.py build && python setup.py install \n",
-                                "ln -s /usr/init/redhat/cfn-hup /etc/init.d/cfn-hup \n",
-                                "chmod 775 /usr/init/redhat/cfn-hup \n",
-                                "mkdir -p /opt/aws/bin \n",
-                                "ln -s /usr/bin/cfn-hup /opt/aws/bin/cfn-hup \n",
-                                "ln -s /usr/bin/cfn-init /opt/aws/bin/cfn-init \n",
-                                "ln -s /usr/bin/cfn-signal /opt/aws/bin/cfn-signal \n",
-                                "ln -s /usr/bin/cfn-elect-cmd-leader /opt/aws/bin/cfn-elect-cmd-leader \n",
-                                "ln -s /usr/bin/cfn-get-metadata /opt/aws/bin/cfn-get-metadata \n",
-                                "ln -s /usr/bin/cfn-send-cmd-event /opt/aws/bin/cfn-send-cmd-event \n",
-                                "ln -s /usr/bin/cfn-send-cmd-result /opt/aws/bin/cfn-send-cmd-result \n",
-                                "iptables -F \n",
-                                "until mount ",
-                                {
-                                    "Ref": "LustreMGTNodeIP"
-                                },
-                                ":/nfs /nfs \n",
-                                "do \n",
-                                "echo 'Sleeping for 10 seconds' \n",
-                                "sleep 10 \n",
-                                "done \n",
-                                "mkdir /nfs/SASGridMidTierNodes \n",
-                                "SASGridMidTierNodes=",
-                                {
-                                    "Fn::FindInMap": [
-                                        "InfraSizeMap",
-                                        "InstanceTypes",
-                                        "NoOfSASGridMidtierInstances"
-                                    ]
-                                },
-                                "\n",
-                                "IP=`ifconfig eth0 | grep 'inet ' | cut -d: -f2 | awk '{print $2}'` && touch /nfs/SASGridMidTierNodes/$IP \n",
-                                "NoOfNodes=`ls /nfs/SASGridMidTierNodes | wc -l` \n",
-                                "until [ $NoOfNodes -eq $SASGridMidTierNodes ] \n",
-                                "do \n",
-                                "echo 'No of IPs are not equal to no of sas grid instances' \n",
-                                "NoOfNodes=`ls /nfs/SASGridMidTierNodes | wc -l` \n",
-                                "sleep 5 \n",
-                                "done \n",
-                                "NodeNumber=`ls /nfs/SASGridMidTierNodes | nl > /tmp/temp && cat /tmp/temp | grep $IP | cut -f1 | sed -r 's/ //g'` \n",
-                                "DOMAIN=",
-                                {
-                                    "Ref": "DomainDNSName"
-                                },
-                                "\n",
-                                "hostnamectl set-hostname --static 'sasgridmidtier'$NodeNumber'.'$DOMAIN'' && echo ''$IP'   sasgridmidtier'$NodeNumber'.'$DOMAIN' sasgridmidtier'$NodeNumber'' >> /nfs/hostsfile \n",
-                                                                "echo 'preserve_hostname: true' >> /etc/cloud/cloud.cfg \n",
-                                "HOSTFILEENTRY=`cat /nfs/hostsfile | nl | cut -f1 | sed -r 's/ //g'| sort -rh | head -1` \n",
-                                "cat /nfs/hostsfile >> /etc/hosts \n",
-                                "echo '",
-                                {
-                                    "Ref": "LustreMGTNodeIP"
-                                },
-                                "@tcp:/lustre   /sas    lustre  flock   0 0' >> /etc/fstab \n",
-                                "pip install awscli \n",
-                                "REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region` \n",
-                                "PRIVATEIP=`curl --silent http://169.254.169.254/latest/meta-data/local-ipv4/` \n",
-                                "FQDN=`cat /etc/hostname` \n",
-                                "SHORTNAME=`cat /etc/hostname | cut -d'.' -f1` \n",
-                                "INSTANCEID=`curl --silent http://169.254.169.254/latest/meta-data/instance-id` \n",
-                                "PRIORITY='4' \n",
-                                "aws --region $REGION dynamodb put-item --table-name ",
-                                                                {
-                                                                        "Ref": "DynamoDBTableName"
-                                },
-                                                                " --item '{ \"InstanceId\": { \"S\": \"'\"$INSTANCEID\"'\" }, \"FQDN\": {\"S\": \"'\"$FQDN\"'\"}, \"ShortName\":{\"S\": \"'\"$SHORTNAME\"'\"}, \"Priority\": {\"N\": \"'\"$PRIORITY\"'\"}, \"PrivateIp\":{\"S\": \"'\"$PRIVATEIP\"'\"} }' \n",
-                                "aws --region $REGION ec2 create-tags --resources $INSTANCEID --tags Key=Name,Value=$FQDN \n",
-                                "touch /opt/signal.sh && chmod +x /opt/signal.sh \n",
-                                "echo '#!/bin/bash' > /opt/signal.sh \n",
-                                "echo 'set -x' >> /opt/signal.sh \n",
-                                "echo 'trap read debug' >> /opt/signal.sh \n",
-                                "echo 'exec 1>/tmp/mount.log 2>&1' >> /opt/signal.sh \n",
-                                "echo \"date\" >> /opt/signal.sh \n",
-                                "echo 'MOUNT=/sas' >> /opt/signal.sh \n",
-                                "echo 'if grep -qs $MOUNT /proc/mounts;' >> /opt/signal.sh \n",
-                                "echo 'then' >> /opt/signal.sh \n",
-                                "echo '  echo \"Filesystem is mounted.\"' >> /opt/signal.sh \n",
-                                "echo '  /opt/aws/bin/cfn-signal -e 0 ",
-                                "         --stack ",
-                                {
-                                    "Ref": "AWS::StackName"
-                                },
-                                "         --resource SASGridMidTier ",
-                                "         --region ",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                "' >> /opt/signal.sh \n",
-                                "echo 'else' >> /opt/signal.sh \n",
-                                "echo '  echo \"Filesystem is not mounted, attempting to mount.\"' >> /opt/signal.sh \n",
-                                "echo '  mount -a' >> /opt/signal.sh \n",
-                                "echo 'fi' >> /opt/signal.sh \n",
-                                "KEY=dummy\n",
-                                {"Fn::Sub": "PARENT_STACK_ID=$(aws --region \"${AWS::Region}\" cloudformation describe-stacks --stack-name \"${AWS::StackName}\" --query \"Stacks[].ParentId\" --output text)\n"},
-                                "PARENT_STACK_NAME=$(aws --region ${REGION} cloudformation describe-stacks --stack-name \"${PARENT_STACK_ID}\" --query \"Stacks[].StackName\" --output text)\n",
-                                                    "KEY=$(aws ssm get-parameter --region $REGION --name \"sas-grid-ansiblekey-${PARENT_STACK_NAME}\" --query Parameter.Value --output text)\n",
-                                                    "echo \"$KEY\" | su ec2-user bash -c 'tee -a ~/.ssh/authorized_keys'\n",
-                                "(echo '@reboot /opt/signal.sh') | crontab - \n",
-                                "echo 'BootStrap completed successfully' \n",
-                                "echo 'Server will now reboot' \n",
-                                "reboot \n"
-                            ]
-                        ]
-                    }
-                }
-            },
-            "CreationPolicy": {
-                "ResourceSignal": {
-                    "Timeout": "PT90M"
                 }
             }
         },
@@ -577,7 +374,7 @@
                                 "systemctl enable rpcbind && systemctl start rpcbind \n",
                                 "tar -xvf /tmp/lustreclient_new.tar -C /tmp/ && cd /tmp/lustreclient/ && yum -y localinstall *.rpm \n",
                                 "sed -i.bak s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config \n",
-                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 502 -g 1003 lsfadmin && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
+                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
                                 "useradd -u 505 -g 1003 sassrv && useradd -u 506 -g 1003 sastrust && useradd -u 507 -g 1003 sasadm && usermod -a -G sas sasinst && \n",
                                 "useradd -u 508 -g 1003 sasevs && useradd -u 509 -g 1003 webanon && useradd -u 510 -g 1003 dbmsowner && useradd -u 511 -g 1003 sasevdb \n",
                                 "yum -y install unzip epel-release xorg-x11-apps \n",
@@ -856,7 +653,7 @@
                                 "systemctl enable rpcbind && systemctl start rpcbind \n",
                                 "tar -xvf /tmp/lustreclient_new.tar -C /tmp/ && cd /tmp/lustreclient/ && yum -y localinstall *.rpm \n",
                                 "sed -i.bak s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config \n",
-                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 502 -g 1003 lsfadmin && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
+                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
                                 "useradd -u 505 -g 1003 sassrv && useradd -u 506 -g 1003 sastrust && useradd -u 507 -g 1003 sasadm && usermod -a -G sas sasinst && \n",
                                 "useradd -u 508 -g 1003 sasevs && useradd -u 509 -g 1003 webanon && useradd -u 510 -g 1003 dbmsowner && useradd -u 511 -g 1003 sasevdb \n",
                                 "yum -y install unzip epel-release xorg-x11-apps \n",
@@ -960,44 +757,6 @@
                     }
                 }
             }
-        },
-        "SASMidTierRecovery": {
-            "Type": "AWS::CloudWatch::Alarm",
-            "Properties": {
-                "AlarmDescription": "Trigger a recovery when instance status check fails for 15 consecutive minutes.",
-                "Namespace": "AWS/EC2",
-                "MetricName": "StatusCheckFailed_System",
-                "Statistic": "Minimum",
-                "Period": "60",
-                "EvaluationPeriods": "15",
-                "ComparisonOperator": "GreaterThanThreshold",
-                "Threshold": "0",
-                "AlarmActions": [
-                    {
-                        "Fn::Join": [
-                            "",
-                            [
-                                "arn:aws:automate:",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                ":ec2:recover"
-                            ]
-                        ]
-                    }
-                ],
-                "Dimensions": [
-                    {
-                        "Name": "InstanceId",
-                        "Value": {
-                            "Ref": "SASGridMidTier"
-                        }
-                    }
-                ]
-            },
-            "DependsOn": [
-                "SASGridMidTier"
-            ]
         },
         "SASMetadataRecovery": {
             "Type": "AWS::CloudWatch::Alarm",

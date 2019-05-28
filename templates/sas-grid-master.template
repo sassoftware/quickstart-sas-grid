@@ -33,19 +33,6 @@
                 },
                 {
                     "Label": {
-                        "default": "Microsoft RD Gateway configuration"
-                    },
-                    "Parameters": [
-                        "RDGWKeyPairName",
-                        "RDGWInstanceType",
-                        "AdminUser",
-                        "AdminPassword",
-                        "DomainDNSName",
-                        "RDGWCIDR"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "Storage Stack:"
                     },
                     "Parameters": [
@@ -61,7 +48,11 @@
                     },
                     "Parameters": [
                         "OperatorEmail",
-                        "StorageKeyPairName"
+                        "StorageKeyPairName",
+                        "AdminUser",
+                        "AdminPassword",
+                        "DomainDNSName",
+                        "AdminCIDR"
                     ]
                 },
                 {
@@ -132,9 +123,6 @@
                 "DomainDNSName": {
                     "default": "Domain DNS name"
                 },
-                "RDGWKeyPairName": {
-                    "default": "RDGW key pair name"
-                },
                 "SASGridKeyPairName": {
                     "default": "SAS Grid key pair name"
                 },
@@ -177,11 +165,8 @@
                 "StorageEBSVolumeSize": {
                     "default": "Storage Disk size for each node"
                 },
-                "RDGWInstanceType": {
-                    "default": "RDGW instance type"
-                },
-                "RDGWCIDR": {
-                    "default": "Allowed RDGW external access CIDR"
+                "AdminCIDR": {
+                    "default": "Allowed external access CIDR"
                 },
                 "VPCCIDR": {
                     "default": "VPC CIDR"
@@ -269,10 +254,6 @@
                 "Lustre",
                 "GPFS"
             ]
-        },
-        "RDGWKeyPairName": {
-            "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
-            "Type": "AWS::EC2::KeyPair::KeyName"
         },
         "SASGridKeyPairName": {
             "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
@@ -389,22 +370,10 @@
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         },
-        "RDGWInstanceType": {
-            "AllowedValues": [
-                "t2.large",
-                "m4.large",
-                "m4.xlarge",
-                "m4.2xlarge",
-                "m4.4xlarge"
-            ],
-            "Default": "t2.large",
-            "Description": "Amazon EC2 instance type for the RD gateway instances.",
-            "Type": "String"
-        },
-        "RDGWCIDR": {
+        "AdminCIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
-            "Description": "Allowed CIDR block for external access to the RD gateways.",
+            "Description": "Allowed CIDR block for external access.",
             "Type": "String"
         },
         "VPCCIDR": {
@@ -541,7 +510,7 @@
                     },
                     "NumberOfAZs": "2",
                     "KeyPairName": {
-                        "Ref": "RDGWKeyPairName"
+                        "Ref": "SASGridKeyPairName"
                     },
                     "PrivateSubnet1ACIDR": {
                         "Ref": "PrivateSubnet1CIDR"
@@ -565,77 +534,6 @@
                         "Ref": "VPCCIDR"
                     },
                     "CreateAdditionalPrivateSubnets": "true"
-                }
-            }
-        },
-        "RDGWStack": {
-            "DependsOn": [
-                "VPCStack"
-            ],
-            "Type": "AWS::CloudFormation::Stack",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": [
-                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-microsoft-rdgateway/templates/rdgw-standalone.template",
-                        {
-                            "QSS3Region": {
-                                "Fn::If": [
-                                    "GovCloudCondition",
-                                    "s3-us-gov-west-1",
-                                    "s3"
-                                ]
-                            }
-                        }
-                    ]
-                },
-                "Parameters": {
-                    "VPCID": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.VPCID"
-                        ]
-                    },
-                    "AdminPassword": {
-                        "Ref": "AdminPassword"
-                    },
-                    "AdminUser": {
-                        "Ref": "AdminUser"
-                    },
-                    "DomainDNSName": {
-                        "Ref": "DomainDNSName"
-                    },
-                    "KeyPairName": {
-                        "Ref": "RDGWKeyPairName"
-                    },
-                    "PublicSubnet1ID": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.PublicSubnet1ID"
-                        ]
-                    },
-                    "PublicSubnet2ID": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.PublicSubnet2ID"
-                        ]
-                    },
-                    "QSS3BucketName": {
-                        "Ref": "QSS3BucketName"
-                    },
-                    "QSS3KeyPrefix": {
-                        "Fn::Sub": "${QSS3KeyPrefix}submodules/quickstart-microsoft-rdgateway/"
-                    },
-                    "RDGWInstanceType": {
-                        "Ref": "RDGWInstanceType"
-                    },
-                    "RDGWCIDR": {
-                        "Ref": "RDGWCIDR"
-                    }
-                }
-            },
-            "CreationPolicy": {
-                "ResourceSignal": {
-                    "Timeout": "PT70M"
                 }
             }
         },
@@ -664,7 +562,7 @@
                         "Ref": "AdminPassword"
                     },
                     "AdminIngressLocation": {
-                        "Ref": "RDGWCIDR"
+                        "Ref": "AdminCIDR"
                     },
                     "SASGridKeyPairName": {
                         "Ref": "SASGridKeyPairName"
@@ -738,11 +636,8 @@
                     "VPCCIDR": {
                         "Ref": "VPCCIDR"
                     },
-                    "RDGWSG": {
-                        "Fn::GetAtt": [
-                            "RDGWStack",
-                            "Outputs.RemoteDesktopGatewaySGID"
-                        ]
+                    "AdminCIDR": {
+                        "Ref": "AdminCIDR"
                     },
                     "StorageStack": {
                         "Ref": "StorageStack"
@@ -763,10 +658,7 @@
                         "Ref": "StorageEBSVolumeSize"
                     }
                 }
-            },
-            "DependsOn": [
-                "RDGWStack"
-            ]
+            }
         }
     }
 }

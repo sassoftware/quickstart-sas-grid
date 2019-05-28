@@ -25,7 +25,7 @@ VPCCIDR: "{{{VPCCIDR}}}"
 PrivateSubnet1ID: "{{{PrivateSubnet1ID}}}"
 PrivateSubnet2ID: "{{{PrivateSubnet2ID}}}"
 PublicSubnet1ID: "{{{PublicSubnet1ID}}}"
-RDGWSG: "{{{RDGWSG}}}"
+RemoteAccessSG: "{{{RemoteAccessSG}}}"
 AdminIngressLocation: "{{{AdminIngressLocation}}}"
 QSS3BucketName: "{{{QSS3BucketName}}}"
 QSS3KeyPrefix: "{{{QSS3KeyPrefix}}}"
@@ -42,12 +42,10 @@ EOF
   # copy depot files to sasgrid /sas
   ansible-playbook -vv copy_files.yml
 
-  # install lsf
-  ansible-playbook -vv lsf_install.yml
-
   # install sas
   ansible-playbook -vvv sas_install_metadata.yml
   ansible-playbook -vvv sas_install_grid1.yml
+  ansible-playbook -vvv sas_install_midtier.yml
 
   # distribute additional /etc/hosts entries
   ansible-playbook -vv update_hosts_storage.yml

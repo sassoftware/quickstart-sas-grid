@@ -125,7 +125,6 @@ then
 fi
 echo "[sasgrid-all:children]" >> $INVENTORYBODY
 echo "sasgridmeta" >> $INVENTORYBODY
-echo "sasgridmidtier" >> $INVENTORYBODY
 echo "sasgridnodes" >> $INVENTORYBODY
 echo " " >> $INVENTORYBODY
 
@@ -157,16 +156,6 @@ echo "[sasgridmeta]" >> $INVENTORYBODY
 echo "sasgridmeta1" >> $INVENTORYBODY
 echo " " >> $INVENTORYBODY
 
-# Midtier VM
-MidtierNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $SAS_STACK  --query 'StackResources[?ResourceType ==`AWS::EC2::Instance`]|[?LogicalResourceId == `SASGridMidTier`].PhysicalResourceId' --output text)
-MidtierNode_IP=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instances --instance-id "$MidtierNode_ID" --query Reservations[*].Instances[*].PrivateIpAddress --output text)
-echo "${MidtierNode_IP} sasgridmidtier1 sasgridmidtier1.{{DomainDNSName}}" >> $TMPHOSTSFILE
-echo "sasgridmidtier1 ansible_host=${MidtierNode_IP}" >> $TMPANSIBLEHEADER
-#sed -i "/^\[sasgridmidtier\]/a sasgridmidtier1" $INVENTORYBODY
-echo "[sasgridmidtier]" >> $INVENTORYBODY
-echo "sasgridmidtier1" >> $INVENTORYBODY
-echo " " >> $INVENTORYBODY
-
 # Grid VMs
 Grid_IDs=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation describe-stack-resources --stack-name $SAS_STACK  --query 'StackResources[?LogicalResourceId == `SASGridEC2Instances`].PhysicalResourceId' --output text)
 # this value has the oss VM ids separated by ":". Convert it into an array
@@ -192,7 +181,6 @@ done
 echo " " >> $INVENTORYBODY
 echo "[sasgrid-all:children]" >> $INVENTORYBODY
 echo "sasgridmeta" >> $INVENTORYBODY
-echo "sasgridmidtier" >> $INVENTORYBODY
 echo "sasgridnodes" >> $INVENTORYBODY
 echo " " >> $INVENTORYBODY
 echo "[sas-all:children]" >> $INVENTORYBODY
@@ -212,5 +200,5 @@ cat /etc/hosts.orig $TMPHOSTSFILE  | sudo tee /etc/hosts
 cat $TMPANSIBLEHEADER $INVENTORYBODY > /tmp/inventory.ini
 
 # update lsf config file with gridhostsN-1
-SECONDARY_GRIDNODES=$(cat /etc/hosts | cut -d' ' -f3 | grep sasgrid[0-9] | sort | tail -n +2 | xargs)
-sed -i "s/SECONDARY_GRIDNODES/${SECONDARY_GRIDNODES}/" /tmp/lsf_install.config
+#SECONDARY_GRIDNODES=$(cat /etc/hosts | cut -d' ' -f3 | grep sasgrid[0-9] | sort | tail -n +2 | xargs)
+#sed -i "s/SECONDARY_GRIDNODES/${SECONDARY_GRIDNODES}/" /tmp/lsf_install.config

@@ -6,7 +6,6 @@
     -  /tmp/quickstart/playbooks/vars.yml
 
   tasks:
-
   - name: Template over response file
     template:
       src: "/tmp/quickstart/playbooks/templates/{{ item }}.j2"

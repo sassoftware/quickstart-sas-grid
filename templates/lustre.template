@@ -13,7 +13,7 @@
                         "PrivateSubnet1ID",
                         "PrivateSubnet2ID",
                         "VPCCIDR",
-                        "RDGWSG"
+                        "RemoteAccessSG"
                     ]
                 },
                 {
@@ -58,8 +58,8 @@
                 "VPCID": {
                     "default": "VPC ID"
                 },
-                "RDGWSG": {
-                    "default": "Security Group ID of RDGW Instance"
+                "RemoteAccessSG": {
+                    "default": "Security Group ID of Linux Bastion"
                 },
                 "LustreEBSVolumeType": {
                     "default": "EBS Volumes type for Lustre Instances"
@@ -112,8 +112,8 @@
             "Description": "Select the ID of an existing VPC",
             "Type": "AWS::EC2::VPC::Id"
         },
-        "RDGWSG": {
-            "Description": "ID of the Security Group (e.g., sg-0343606e)",
+        "RemoteAccessSG": {
+            "Description": "ID of the Security Group",            
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
         "DomainDNSName": {
@@ -569,13 +569,12 @@
                                 "yum -y update\n",
                                 "systemctl disable firewalld \n",
                                 "service firewalld stop \n",
-                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 502 -g 1003 lsfadmin && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
+                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
                                 "useradd -u 505 -g 1003 sassrv && useradd -u 506 -g 1003 sastrust && useradd -u 507 -g 1003 sasadm && usermod -a -G sas sasinst && \n",
                                 "useradd -u 508 -g 1003 sasevs && useradd -u 509 -g 1003 webanon && useradd -u 510 -g 1003 dbmsowner && useradd -u 511 -g 1003 sasevdb \n",
-                                "mkdir /nfs /lsf_config /nfs/LustreMGTNodes /nfs/LustreMDTNodes /nfs/LustreOSSNodes && chmod -R 777 /nfs \n",
+                                "mkdir /nfs /nfs/LustreMGTNodes /nfs/LustreMDTNodes /nfs/LustreOSSNodes && chmod -R 777 /nfs \n",
                                 "mkfs.lustre --fsname lustre --reformat --mgs /dev/xvdf \n",
-                                "UUID=`blkid | grep xvdf | sed 's/.*UUID=//' | cut -d' ' -f1` && echo 'UUID='$UUID'   /lsf_config lustre defaults,_netdev 0 0' >> /etc/fstab \n",
-                                "mount /lsf_config \n",
+                                "UUID=`blkid | grep xvdf | sed 's/.*UUID=//' | cut -d' ' -f1` && echo 'UUID='$UUID' lustre defaults,_netdev 0 0' >> /etc/fstab \n",
                                 "yum -y install jq mdadm python-pip vim wget mlocate nfs-utils libnfsidmap \n",
                                 "pip install pystache argparse python-daemon requests \n",
                                 "cd /opt && curl -O https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz \n",
@@ -667,7 +666,6 @@
                                 "echo 'trap read debug' >> /opt/signal.sh \n",
                                 "echo 'exec 1>/tmp/mount.log 2>&1' >> /opt/signal.sh \n",
                                 "echo \"date\" >> /opt/signal.sh \n",
-                                "echo 'MOUNT=/lsf_config' >> /opt/signal.sh \n",
                                 "echo 'if grep -qs $MOUNT /proc/mounts;' >> /opt/signal.sh \n",
                                 "echo 'then' >> /opt/signal.sh \n",
                                 "echo '  echo \"Filesystem is mounted.\"' >> /opt/signal.sh \n",
@@ -684,7 +682,6 @@
                                 "' >> /opt/signal.sh \n",
                                 "echo 'else' >> /opt/signal.sh \n",
                                 "echo '  echo \"Filesystem is not mounted, attempting to mount.\"' >> /opt/signal.sh \n",
-                                "echo '  mount /lsf_config' >> /opt/signal.sh \n",
                                 "echo '  /opt/aws/bin/cfn-signal -e $? ",
                                 "         --stack ",
                                 {
@@ -833,7 +830,7 @@
                                 "yum -y update\n",
                                 "systemctl disable firewalld \n",
                                 "service firewalld stop \n",
-                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 502 -g 1003 lsfadmin && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
+                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
                                 "useradd -u 505 -g 1003 sassrv && useradd -u 506 -g 1003 sastrust && useradd -u 507 -g 1003 sasadm && usermod -a -G sas sasinst && \n",
                                 "useradd -u 508 -g 1003 sasevs && useradd -u 509 -g 1003 webanon && useradd -u 510 -g 1003 dbmsowner && useradd -u 511 -g 1003 sasevdb \n",
                                 "yum -y install jq mdadm python-pip vim wget mlocate nfs-utils libnfsidmap \n",
@@ -852,7 +849,7 @@
                                 "ln -s /usr/bin/cfn-send-cmd-event /opt/aws/bin/cfn-send-cmd-event \n",
                                 "ln -s /usr/bin/cfn-send-cmd-result /opt/aws/bin/cfn-send-cmd-result \n",
                                 "systemctl enable rpcbind && systemctl start rpcbind \n",
-                                "mkdir /nfs /lsf_config \n",
+                                "mkdir /nfs \n",
                                 "until mount ",
                                 {
                                     "Fn::GetAtt": [
@@ -900,7 +897,7 @@
                                     ]
                                 },
                                 "@tcp --index=0 /dev/xvdf \n",
-                                "UUID=`blkid | grep xvdf | sed 's/.*UUID=//' | cut -d' ' -f1` && echo 'UUID='$UUID'   /lsf_config lustre defaults,_netdev 0 0' >> /etc/fstab \n",
+                                "UUID=`blkid | grep xvdf | sed 's/.*UUID=//' | cut -d' ' -f1` && echo 'UUID='$UUID' lustre defaults,_netdev 0 0' >> /etc/fstab \n",
                                 "pip install awscli \n",
                                 "REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region` \n",
                                 "PRIVATEIP=`curl --silent http://169.254.169.254/latest/meta-data/local-ipv4/` \n",
@@ -941,7 +938,6 @@
                                 "echo 'trap read debug' >> /opt/signal.sh \n",
                                 "echo 'exec 1>/tmp/mount.log 2>&1' >> /opt/signal.sh \n",
                                 "echo \"date\" >> /opt/signal.sh \n",
-                                "echo 'MOUNT=/lsf_config' >> /opt/signal.sh \n",
                                 "echo 'if grep -qs $MOUNT /proc/mounts;' >> /opt/signal.sh \n",
                                 "echo 'then' >> /opt/signal.sh \n",
                                 "echo '  echo \"Filesystem is mounted.\"' >> /opt/signal.sh \n",
@@ -958,7 +954,6 @@
                                 "' >> /opt/signal.sh \n",
                                 "echo 'else' >> /opt/signal.sh \n",
                                 "echo '  echo \"Filesystem is not mounted, attempting to mount.\"' >> /opt/signal.sh \n",
-                                "echo '  mount /lsf_config' >> /opt/signal.sh \n",
                                 "echo '  /opt/aws/bin/cfn-signal -e $? ",
                                 "         --stack ",
                                 {
@@ -1142,7 +1137,7 @@
                 }
             }
         },
-        "MGTAllowRDGWSG": {
+        "MGTAllowLinuxSG": {
             "Type": "AWS::EC2::SecurityGroupIngress",
             "Properties": {
                 "IpProtocol": "-1",
@@ -1150,7 +1145,7 @@
                     "Ref": "LustreMGTSG"
                 },
                 "SourceSecurityGroupId": {
-                    "Ref": "RDGWSG"
+                    "Ref": "RemoteAccessSG"
                 }
             }
         },
@@ -1202,7 +1197,7 @@
                 }
             }
         },
-        "MDTAllowRDGWSG": {
+        "MDTAllowLinuxSG": {
             "Type": "AWS::EC2::SecurityGroupIngress",
             "Properties": {
                 "IpProtocol": "-1",
@@ -1210,7 +1205,7 @@
                     "Ref": "LustreMDTSG"
                 },
                 "SourceSecurityGroupId": {
-                    "Ref": "RDGWSG"
+                    "Ref": "RemoteAccessSG"
                 }
             }
         },
@@ -1250,7 +1245,7 @@
                 }
             }
         },
-        "OSSAllowRDGWSG": {
+        "OSSAllowLinuxSG": {
             "Type": "AWS::EC2::SecurityGroupIngress",
             "Properties": {
                 "IpProtocol": "-1",
@@ -1258,7 +1253,7 @@
                     "Ref": "LustreOSSSG"
                 },
                 "SourceSecurityGroupId": {
-                    "Ref": "RDGWSG"
+                    "Ref": "RemoteAccessSG"
                 }
             }
         },
@@ -1274,7 +1269,7 @@
                 }
             }
         },
-        "SASSGAllowRDGWSG": {
+        "SASSGAllowLinuxSG": {
             "Type": "AWS::EC2::SecurityGroupIngress",
             "Properties": {
                 "IpProtocol": "-1",
@@ -1282,7 +1277,7 @@
                     "Ref": "SASGridSG"
                 },
                 "SourceSecurityGroupId": {
-                    "Ref": "RDGWSG"
+                    "Ref": "RemoteAccessSG"
                 }
             }
         },
@@ -1769,7 +1764,7 @@
                                 "yum -y update\n",
                                 "systemctl disable firewalld \n",
                                 "service firewalld stop \n",
-                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 502 -g 1003 lsfadmin && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
+                                "groupadd -f -g 1003 sas && useradd -u 501 -g 1003 sasinst && useradd -u 503 -g 1003 sas && useradd -u 504 -g 1003 sasdemo && \n",
                                 "useradd -u 505 -g 1003 sassrv && useradd -u 506 -g 1003 sastrust && useradd -u 507 -g 1003 sasadm && usermod -a -G sas sasinst && \n",
                                 "useradd -u 508 -g 1003 sasevs && useradd -u 509 -g 1003 webanon \n",
                                 "yum -y install jq mdadm python-pip vim wget mlocate nfs-utils libnfsidmap \n",
@@ -1791,7 +1786,7 @@
                                 "echo 'DEVICE /dev/xvdb[a-t]' > /etc/mdadm.conf \n",
                                 "echo 'ARRAY /dev/md0 devices=/dev/xvdb[a-t]' >> /etc/mdadm.conf \n",
                                 "mdadm -C /dev/md0 --level=raid0 --raid-devices=20 /dev/xvdb[a-t] \n",
-                                "mkdir /nfs && mkdir /lsf_data \n",
+                                "mkdir /nfs \n",
                                 "until mount ",
                                 {
                                     "Fn::GetAtt": [
@@ -1835,7 +1830,7 @@
                                     ]
                                 },
                                 "@tcp --index='$NodeNumber' /dev/md0' > /tmp/temp.sh && chmod +x /tmp/temp.sh && /bin/bash /tmp/temp.sh \n",
-                                "UUID=`blkid | grep md0 | cut -d' ' -f3` && echo ''$UUID' /lsf_data lustre defaults,_netdev 0 0' >> /etc/fstab \n",
+                                "UUID=`blkid | grep md0 | cut -d' ' -f3` && echo ''$UUID' lustre defaults,_netdev 0 0' >> /etc/fstab \n",
                                 "pip install awscli \n",
                                 "REGION=`curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region` \n",
                                 "PRIVATEIP=`curl --silent http://169.254.169.254/latest/meta-data/local-ipv4/` \n",
@@ -1876,7 +1871,6 @@
                                 "echo 'trap read debug' >> /opt/signal.sh \n",
                                 "echo 'exec 1>/tmp/mount.log 2>&1' >> /opt/signal.sh \n",
                                 "echo \"date\" >> /opt/signal.sh \n",
-                                "echo 'MOUNT=/lsf_data' >> /opt/signal.sh \n",
                                 "echo 'if grep -qs $MOUNT /proc/mounts;' >> /opt/signal.sh \n",
                                 "echo 'then' >> /opt/signal.sh \n",
                                 "echo '  echo \"Filesystem is mounted.\"' >> /opt/signal.sh \n",
@@ -1887,7 +1881,6 @@
                                 "\"' >> /opt/signal.sh \n",
                                 "echo 'else' >> /opt/signal.sh \n",
                                 "echo '  echo \"Filesystem is not mounted, attempting to mount.\"' >> /opt/signal.sh \n",
-                                "echo '  mount /lsf_data' >> /opt/signal.sh \n",
                                 "echo '/opt/aws/bin/cfn-signal -e $? -r Success \"",
                                 {
                                     "Ref": "WaitHandle"

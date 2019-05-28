@@ -6,7 +6,6 @@
     -  /tmp/quickstart/playbooks/vars.yml
 
   tasks:
-
   - name: Template over response file
     template:
       src: "/tmp/quickstart/playbooks/templates/{{ item }}.j2"
@@ -28,5 +27,5 @@
     -  /tmp/quickstart/playbooks/vars.yml
 
   tasks:
-  - name: Start SAS on SAS Midtier Server
+  - name: Start Midtier on SAS Metadata Server
     command: sh /sas/quickstart/playbooks/templates/sasgridmidtier.sh {{SASSoftwareDepotName}} &> /tmp/sasgridmidtier.log

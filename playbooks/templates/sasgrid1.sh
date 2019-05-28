@@ -19,6 +19,7 @@ EOF
 
 sudo -u root bash << EOF
 /sas/SASHome/SASFoundation/9.4/utilities/bin/setuid.sh 
+chmod 755 /sas/SASHome/SASFoundation/9.4/utilities/bin/launcher 
 exit
 EOF
 

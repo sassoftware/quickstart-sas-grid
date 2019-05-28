@@ -36,8 +36,7 @@
                     "Parameters": [
                         "AdminPassword",
                         "AdminIngressLocation",
-                        "DomainDNSName",
-                        "RDGWSG"
+                        "DomainDNSName"
                     ]
                 },
                 {
@@ -57,7 +56,8 @@
                     },
                     "Parameters": [
                         "OperatorEmail",
-                        "StorageKeyPairName"
+                        "StorageKeyPairName",
+                        "AdminCIDR"
                     ]
                 },
                 {
@@ -122,6 +122,9 @@
                 "VPCCIDR": {
                     "default": "VPC CIDR"
                 },
+                "AdminCIDR": {
+                    "default": "Admin CIDR"
+                },
                 "PrivateSubnet1ID": {
                     "default": "Private subnet 1 ID"
                 },
@@ -136,9 +139,6 @@
                 },
                 "DomainDNSName": {
                     "default": "Domain DNS name"
-                },
-                "RDGWSG": {
-                    "default": "RDGW security group ID"
                 },
                 "StorageKeyPairName": {
                     "default": "Storage KeyPair Name"
@@ -234,10 +234,6 @@
             "MaxLength": "25",
             "MinLength": "3",
             "Type": "String"
-        },
-        "RDGWSG": {
-            "Description": "ID of the RD Gateway security group (e.g., sg-0343606e).",
-            "Type": "AWS::EC2::SecurityGroup::Id"
         },
         "SASGridKeyPairName": {
             "Description": "A public/private key pair, which allows you to securely connect to your instance after it launches.",
@@ -346,6 +342,12 @@
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.0.0/16",
             "Description": "CIDR block for the VPC",
+            "Type": "String"
+        },
+        "AdminCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
+            "Description": "Allowed CIDR block for external access.",
             "Type": "String"
         },
         "AdminIngressLocation": {
@@ -484,6 +486,49 @@
         }
     },
     "Resources": {
+        "RemoteAccessSG": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Enable RDP access from the Internet",
+                "VpcId": {
+                    "Ref": "VPCID"
+                },
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "3389",
+                        "ToPort": "3389",
+                        "CidrIp": {
+                            "Ref": "AdminCIDR"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": {
+                            "Ref": "AdminCIDR"
+                        }
+                    },
+                    {
+                        "IpProtocol": "udp",
+                        "FromPort": "3391",
+                        "ToPort": "3391",
+                        "CidrIp": {
+                            "Ref": "AdminCIDR"
+                    }
+                    },
+                    {
+                        "IpProtocol": "icmp",
+                        "FromPort": "-1",
+                        "ToPort": "-1",
+                        "CidrIp": {
+                            "Ref": "AdminCIDR"
+                        }
+                    }
+                ]
+            }
+        },
         "AnsiblePublicKey": {
             "Type": "AWS::SSM::Parameter",
             "Properties": {
@@ -636,8 +681,11 @@
                     "VPCCIDR": {
                         "Ref": "VPCCIDR"
                     },
-                    "RDGWSG": {
-                        "Ref": "RDGWSG"
+                    "RemoteAccessSG": {
+                        "Fn::GetAtt": [
+                            "RemoteAccessSG",
+                            "GroupId"
+                        ]
                     },
                     "LustreEBSVolumeType": {
                         "Ref": "StorageEBSVolumeType"
@@ -653,6 +701,9 @@
                     }
                 }
             },
+            "DependsOn": [
+                "RemoteAccessSG"
+            ],
             "Condition": "RunLustreStack"
         },
         "GPFSStack": {
@@ -678,7 +729,10 @@
                         "Ref": "LicenseAgreementTerms"
                     },
                     "BastionSecurityGroupID": {
-                        "Ref": "RDGWSG"
+                        "Fn::GetAtt": [
+                            "RemoteAccessSG",
+                            "GroupId"
+                        ]
                     },
                     "BlockSize": {
                         "Fn::FindInMap": [
@@ -759,7 +813,8 @@
                 }
             },
             "DependsOn": [
-                "DivideEBSVolumeSize"
+                "DivideEBSVolumeSize",
+                "RemoteAccessSG"
             ]
         },
         "SASGridStack": {
@@ -843,7 +898,8 @@
                 }
             },
             "DependsOn": [
-                "LustreStack"
+                "LustreStack",
+                "RemoteAccessSG"
             ],
             "Condition": "RunLustreStack"
         },
@@ -901,11 +957,14 @@
                     "VPCID": {
                         "Ref": "VPCID"
                     },
+                    "RDGWSecurityGroup": {
+                        "Fn::GetAtt": [
+                            "RemoteAccessSG",
+                            "GroupId"
+                        ]
+                    },
                     "AdminIngressLocation": {
                         "Ref": "AdminIngressLocation"
-                    },
-                    "RDGWSecurityGroup": {
-                        "Ref": "RDGWSG"
                     },
                     "QSS3BucketName": {
                         "Ref": "QSS3BucketName"
@@ -920,7 +979,10 @@
                         "Ref": "StorageStack"
                     }
                 }
-            }
+            },
+            "DependsOn": [
+                "RemoteAccessSG"
+            ]
         },
         "GPFSSASGrid": {
             "Type": "AWS::CloudFormation::Stack",

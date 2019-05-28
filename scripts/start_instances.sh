@@ -121,11 +121,11 @@ MidtierNode_ID=$(aws --no-paginate --region "{{AWSRegion}}" cloudformation descr
 echo "$MidtierNode_ID" >> /tmp/sas_nodes
 aws ec2 --region "{{AWSRegion}}" start-instances --instance-ids $MidtierNode_ID
 
-# Check status of midtier and metadata nodes
+# Check status of metadata nodes
 STATUS='status'
 until [ 2 == "$(echo "$STATUS" | grep -o "passed" | wc -l)" ]; do
   sleep 10
-  STATUS=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instance-status --instance-ids $MetadataNode_ID $MidtierNode_ID --query InstanceStatuses[*].SystemStatus --output text)
+  STATUS=$(aws --no-paginate --region "{{AWSRegion}}" ec2 describe-instance-status --instance-ids $MetadataNode_ID --query InstanceStatuses[*].SystemStatus --output text)
 done
 
 # Grid VMs
@@ -157,6 +157,5 @@ until [ $s_ct == "$(echo "$STATUS" | grep -o "passed" | wc -l)" ]; do
   if [[ $(echo "$STATUS_CHECK_STOPPED" | grep -o "stopped" | wc -l) > 0 ]]; then aws ec2 --region "{{AWSRegion}}" start-instances --instance-ids $s_ids; fi
 done
 
-ansible-playbook lsf_restart.yml -vv
 ansible-playbook sas_servers_start.yml -vv
 ansible-playbook sas_servers_start_studio.yml -vv

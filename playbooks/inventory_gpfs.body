@@ -2,16 +2,12 @@
 [sasgridmeta]
 sasgridmeta1
 
-[sasgridmidtier]
-sasgridmidtier1
-
 [sasgridnodes]
 sasgrid1
 sasgrid2
 
 [sasgrid-all:children]
 sasgridmeta
-sasgridmidtier
 sasgridnodes
 
 [gpfsserver]
